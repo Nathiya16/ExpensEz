@@ -1,0 +1,1 @@
+export const BASEPATH = 'http://192.168.0.24:8081/';
