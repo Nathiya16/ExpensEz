@@ -19,7 +19,7 @@ import ApprovalsScreen from './src/screen/ApprovalsScreen/ApprovalsScreen';
 import ProfileScreen from './src/screen/ProfileScreen/ProfileScreen';
 import ClaimSubmitScreen from './src/screen/ClaimsScreen/ClaimSubmitScreen';
 import NotificationScreen from './src/screen/NotificationScreen/NotificationScreen';
-
+import ExpenseHeadChart from './src/screen/HomeScreen/ExpenseHeadChart';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

@@ -1543,26 +1543,17 @@
 
 
 // import React, { useState, useEffect } from 'react';
-// import {
-//   SafeAreaView,
-//   View,
-//   Text,
-//   StyleSheet,
-//   Dimensions,
-//   ScrollView,
-//   ActivityIndicator, 
-//   TouchableOpacity
-// } from 'react-native';
-// import { LineChart } from 'react-native-chart-kit';
+// import {SafeAreaView,View,Text,StyleSheet,ScrollView,ActivityIndicator, TouchableOpacity} from 'react-native';
 // import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // import { BASEPATH } from '../config';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import axios from 'axios';
 // import { useTheme } from 'react-native-paper';
 // import IonIcon from 'react-native-vector-icons/Ionicons';
-
+// import ExpenseHeadChart from './ExpenseHeadChart';
 // const HomeScreen = ({navigation}) => {
-//    const { theme } = useTheme();
+//    const theme = useTheme(); 
+
 //    const [unreadCount, setUnreadCount] = useState(0);
 //      useEffect(() => {
 //     const unsubscribe = navigation.addListener('focus', () => {
@@ -1595,16 +1586,6 @@
 //     claimTrend: 0,
 //   });
   
-//   const [chartData, setChartData] = useState({
-//     labels: [],
-//     approved: [],
-//     rejected: [],
-//     pending: [],
-//     highlightedMonth: '',
-//     highlightedAmount: 0,
-//     isLoading: true,
-//     error: null
-//   });
   
   
 //   const [loading, setLoading] = useState(true);
@@ -1622,7 +1603,7 @@
 //     fetchUserData(greeting);
     
 //     // Fetch claims data for chart and stats
-//     fetchClaimsData();
+//    // fetchClaimsData();
     
    
     
@@ -1655,103 +1636,7 @@
 //     }
 //   };
 
-//   // Fetch and process claims data
-//   const fetchClaimsData = async () => {
-//     try {
-//       const emp_id = await AsyncStorage.getItem('username');
-//     const company_id = await AsyncStorage.getItem('companyname');
-
-//      if (!emp_id || !company_id) {
-//        throw new Error('Missing emp_id or company_id in AsyncStorage');
-//      }
-      
-//       const response = await axios.get(`${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`);
-//       const data = response.data;
-      
-//       // Process claims data for chart
-//       const processedChartData = processClaimsChartData(data.claims);
-//       setChartData({
-//         ...processedChartData,
-//         isLoading: false,
-//         error: null
-//       });
-      
-//       // Process claims data for statistics
-//       const processedStatsData = processClaimsStats(data.claims);
-//       setClaimStats(processedStatsData);
-      
-//       setLoading(false);
-//     } catch (error) {
-//       console.error('Error fetching claims data:', error);
-//       setChartData(prevState => ({
-//         ...prevState,
-//         isLoading: false,
-//         error: 'Failed to load claims data'
-//       }));
-//       setLoading(false);
-//     }
-//   };
-
-//   // Process raw claims data into chart-friendly format
-//   const processClaimsChartData = (claims) => {
-//     // Initialize data structure to track monthly amounts by status
-//     const monthlyData = {};
-//     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-//                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-//     // Get current month for highlighting
-//     const currentDate = new Date();
-//     const currentMonth = months[currentDate.getMonth()];
-    
-//     // Initialize month data
-//     months.forEach(month => {
-//       monthlyData[month] = {
-//         approved: 0,
-//         rejected: 0,
-//         pending: 0
-//       };
-//     });
-    
-//     // Calculate total amount for each month by status
-//     claims && claims.forEach(claim => {
-//       if (claim.submitted_date) {
-//         const date = new Date(claim.submitted_date);
-//         const month = months[date.getMonth()];
-        
-//         // Add amount to appropriate status category
-//         if (claim.status_of_approval === 'approved') {
-//           monthlyData[month].approved += Number(claim.claim_amount || 0);
-//         } else if (claim.status_of_approval === 'rejected') {
-//           monthlyData[month].rejected += Number(claim.claim_amount || 0);
-//         } else {
-//           // Assuming anything not approved or rejected is pending
-//           monthlyData[month].pending += Number(claim.claim_amount || 0);
-//         }
-//       }
-//     });
-    
-//     // Get last 6 months for display
-//     const lastSixMonths = getLastSixMonths(months, currentDate.getMonth());
-    
-//     // Extract the data for chart
-//     const approvedData = lastSixMonths.map(month => monthlyData[month].approved / 1000); // Convert to thousands for better display
-//     const rejectedData = lastSixMonths.map(month => monthlyData[month].rejected / 1000);
-//     const pendingData = lastSixMonths.map(month => monthlyData[month].pending / 1000);
-    
-//     // Get current month total for highlight badge
-//     const currentMonthTotal = monthlyData[currentMonth].approved + 
-//                              monthlyData[currentMonth].rejected + 
-//                              monthlyData[currentMonth].pending;
-    
-//     return {
-//       labels: lastSixMonths,
-//       approved: approvedData,
-//       rejected: rejectedData,
-//       pending: pendingData,
-//       highlightedMonth: currentMonth,
-//       highlightedAmount: currentMonthTotal
-//     };
-//   };
+  
   
 //   // Process claims data for statistics
 //   const processClaimsStats = (claims) => {
@@ -1828,20 +1713,8 @@
 //     return result;
 //   };
 
-//   // Calculate y-axis labels based on data
-//   const getYAxisLabels = () => {
-//     if (!chartData.approved.length && !chartData.rejected.length) {
-//       return [0, 25, 50, 75, 100]; // Default values if no data
-//     }
-    
-//     // Find max value in all datasets
-//     const allValues = [...chartData.approved, ...chartData.rejected];
-//     const maxValue = Math.max(...allValues, 1); // Ensure at least 1 to avoid division by zero
-    
-//     // Create 5 evenly spaced labels
-//     const step = Math.ceil(maxValue / 4);
-//     return [0, step, step * 2, step * 3, Math.ceil(step * 4)];
-//   };
+  
+  
 
 //   // Format number with commas
 //   const formatNumber = (num) => {
@@ -1901,103 +1774,19 @@
 //           <Text style={styles.userName}>{userData.name}</Text>
 //           <Text style={styles.subGreeting}>Have a delightful day!</Text>
 //         </View>
-        
+//          <Text style={styles.sectionTitle}>Expense Analysis</Text>
+    
+//     {/* Expense Head Chart Component */}
+//     {!loading && (
+//       <ExpenseHeadChart 
+//         claims={data.claims} 
+//         policyDetails={data.policy_details_data_sec} 
+//       />
+//     )}
 //         {/* Claims Section */}
 //         <View style={styles.claimsContainer}>
 //           <Text style={styles.sectionTitle}>Claims</Text>
-          
-//           {/* Legend */}
-//           <View style={styles.legendContainer}>
-//             <View style={styles.legendItem}>
-//               <View style={[styles.legendDot, { backgroundColor: '#4285F4' }]} />
-//               <Text>Approved</Text>
-//             </View>
-//             <View style={styles.legendItem}>
-//               <View style={[styles.legendDot, { backgroundColor: '#34A853' }]} />
-//               <Text>Rejected</Text>
-//             </View>
-//             <View style={styles.legendItem}>
-//               <View style={[styles.legendDot, { backgroundColor: '#F29339' }]} />
-//               <Text>Pending</Text>
-//             </View>
-//           </View>
-          
-//           {/* Chart - Render only if data is loaded */}
-//           {!chartData.isLoading && !chartData.error && (
-//             <View style={styles.chartContainer}>
-//               <LineChart
-//                 data={{
-//                   labels: chartData.labels,
-//                   datasets: [
-//                     {
-//                       data: chartData.approved.length > 0 ? chartData.approved : [0, 0, 0, 0, 0, 0],
-//                       color: () => '#4285F4',
-//                       strokeWidth: 2,
-//                     },
-//                     {
-//                       data: chartData.rejected.length > 0 ? chartData.rejected : [0, 0, 0, 0, 0, 0],
-//                       color: () => '#34A853',
-//                       strokeWidth: 2,
-//                     },
-//                   ],
-//                 }}
-//                 width={Dimensions.get('window').width - 60}
-//                 height={220}
-//                 yAxisLabel=""
-//                 yAxisSuffix="K"
-//                 yAxisInterval={1}
-//                 chartConfig={{
-//                   backgroundColor: '#fff',
-//                   backgroundGradientFrom: '#fff',
-//                   backgroundGradientTo: '#fff',
-//                   decimalPlaces: 0,
-//                   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-//                   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-//                   style: {
-//                     borderRadius: 16,
-//                   },
-//                   propsForDots: {
-//                     r: '4',
-//                     strokeWidth: '2',
-//                     stroke: '#fff',
-//                   },
-//                   propsForBackgroundLines: {
-//                     strokeWidth: 1,
-//                     stroke: '#e0e0e0',
-//                     strokeDasharray: '',
-//                   },
-//                   propsForVerticalLabels: {
-//                     fontSize: 10,
-//                     rotation: 0,
-//                     fontWeight: 'normal',
-//                   },
-//                   propsForHorizontalLabels: {
-//                     fontSize: 10,
-//                     fontWeight: 'normal',
-//                   },
-//                   // Make sure Y-axis labels are visible
-//                   formatYLabel: (value) => `${value}`,
-//                 }}
-//                 bezier
-//                 style={styles.chart}
-//                 withDots={true}
-//                 withInnerLines={true}
-//                 withOuterLines={true}
-//                 withVerticalLines={true}
-//                 withHorizontalLines={true}
-//                 fromZero
-//                 withShadow={false}
-//                 segments={4}
-//               />
-              
-//               {/* Amount Badge */}
-//               {/* <View style={styles.amountBadge}>
-//                 <Text style={styles.amountText}>₹ {formatNumber(chartData.highlightedAmount)}</Text>
-//                 <Text style={styles.amountMonth}>{chartData.highlightedMonth}</Text>
-//               </View> */}
-//             </View>
-//           )}
-          
+        
 //           {/* Show error message if data loading failed */}
 //           {chartData.error && (
 //             <View style={styles.errorContainer}>
@@ -2045,32 +1834,6 @@
 //               </View>
 //             </View>
 //           </View>
-          
-//           {/* Monthly Claim */}
-//           {/* <View style={styles.monthlyClaim}>
-//             <View>
-//               <Text style={styles.monthlyClaimValue}>{formatNumber(claimStats.claimThisMonth)}</Text>
-//               <View style={styles.claimTrendContainer}>
-//                 <Text style={[
-//                   styles.claimTrendValue,
-//                   { color: claimStats.claimTrend >= 0 ? '#34A853' : '#EA4335' }
-//                 ]}>
-//                   {Math.abs(claimStats.claimTrend)}%
-//                 </Text>
-//                 <Icon
-//                   name={claimStats.claimTrend >= 0 ? 'arrow-up' : 'arrow-down'}
-//                   size={16}
-//                   color={claimStats.claimTrend >= 0 ? '#34A853' : '#EA4335'}
-//                 />
-//               </View>
-//             </View>
-//             <Text style={styles.monthlyClaimLabel}>Claim this month</Text>
-            
-            
-//             <View style={styles.miniChart}>
-//               <View style={styles.miniChartLine} />
-//             </View>
-//           </View> */}
 //         </View>
 //       </ScrollView>
 //     </SafeAreaView>
@@ -2284,140 +2047,2397 @@
 
 // export default HomeScreen;
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
-import { VictoryChart, VictoryBar, VictoryStack, VictoryAxis, VictoryTheme } from 'victory-native';
-import Svg from 'react-native-svg';
+// import React, { useState, useEffect } from 'react';
+// import {
+//   SafeAreaView,
+//   View,
+//   Text,
+//   StyleSheet,
+//   ScrollView,
+//   ActivityIndicator,
+//   TouchableOpacity
+// } from 'react-native';
+// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import IonIcon from 'react-native-vector-icons/Ionicons';
+// import { useTheme } from 'react-native-paper';
+// import { BASEPATH } from '../config';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import axios from 'axios';
+// import ExpenseHeadChart from './ExpenseHeadChart';
 
-// Utility function to transform API data
-const transformData = (claims) => {
-  const result = {};
+// const HomeScreen = ({ navigation }) => {
+//   const theme = useTheme();
 
-  claims.forEach(claim => {
-    const head = `Expense ${claim.expense_head}`;
-    const status = claim.status_of_approval || 'pending';
-    const amount = claim.documents?.[0]?.entered_amount || 0;
+//   const [unreadCount, setUnreadCount] = useState(0);
+//   const [userData, setUserData] = useState({ name: '', greeting: '' });
+//   const [claimStats, setClaimStats] = useState({
+//     approvalRate: 0,
+//     approvalTrend: '',
+//     dealRate: 0,
+//     dealTrend: '',
+//     claimThisMonth: 0,
+//     claimTrend: 0
+//   });
+//   const [data, setData] = useState({
+//     claims: [],
+//     policy_details_data_sec: []
+//   });
+//   const [loading, setLoading] = useState(true);
 
-    if (!result[head]) {
-      result[head] = { approved: 0, rejected: 0, pending: 0 };
-    }
+//   // Fetch unread count when screen focuses
+//   useEffect(() => {
+//     const unsubscribe = navigation.addListener('focus', () => {
+//       getUnreadCount();
+//     });
 
-    result[head][status] += amount;
-  });
+//     getUnreadCount();
+//     return unsubscribe;
+//   }, [navigation]);
 
-  const heads = Object.keys(result);
-  const approved = heads.map(h => ({ x: h, y: result[h].approved }));
-  const rejected = heads.map(h => ({ x: h, y: result[h].rejected }));
-  const pending = heads.map(h => ({ x: h, y: result[h].pending }));
+//   const getUnreadCount = async () => {
+//     const count = await AsyncStorage.getItem('unreadCount');
+//     setUnreadCount(parseInt(count || '0', 10));
+//   };
 
-  return { approved, rejected, pending };
+//   const handleNotification = () => {
+//     navigation.navigate('Notifications');
+//   };
+
+//   useEffect(() => {
+//     const hour = new Date().getHours();
+//     let greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+//     fetchUserData(greeting);
+//     fetchClaimsData();
+//   }, []);
+
+//   const fetchUserData = async (greeting) => {
+//     try {
+//       const emp_id = await AsyncStorage.getItem('username');
+//       const company_id = await AsyncStorage.getItem('companyname');
+
+//       if (!emp_id || !company_id) throw new Error('Missing emp_id or company_id');
+
+//       const response = await axios.get(
+//         `${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`
+//       );
+//       const data = response.data;
+
+//       setUserData({
+//         name: data.name || 'User',
+//         greeting
+//       });
+//     } catch (error) {
+//       console.error('Error fetching user data:', error);
+//       setUserData({ name: 'User', greeting });
+//     }
+//   };
+
+//   const fetchClaimsData = async () => {
+//     try {
+//       const emp_id = await AsyncStorage.getItem('username');
+//       const company_id = await AsyncStorage.getItem('companyname');
+
+//       if (!emp_id || !company_id) throw new Error('Missing emp_id or company_id');
+
+//       const response = await axios.get(
+//         `${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`
+//       );
+
+//       const responseData = response.data;
+
+//       setData({
+//         claims: responseData.claims || [],
+//         policy_details_data_sec: responseData.policy_details_data_sec || []
+//       });
+
+//       const stats = processClaimsStats(responseData.claims);
+//       setClaimStats(stats);
+//     } catch (error) {
+//       console.error('Error fetching claims data:', error);
+//       setData({ claims: [], policy_details_data_sec: [] });
+//       setClaimStats({
+//         approvalRate: 0,
+//         approvalTrend: 'down',
+//         dealRate: 0,
+//         dealTrend: 'down',
+//         claimThisMonth: 0,
+//         claimTrend: 0
+//       });
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const processClaimsStats = (claims) => {
+//     if (!claims || !claims.length) {
+//       return {
+//         approvalRate: 0,
+//         approvalTrend: 'up',
+//         dealRate: 0,
+//         dealTrend: 'down',
+//         claimThisMonth: 0,
+//         claimTrend: 0
+//       };
+//     }
+
+//     const totalClaims = claims.length;
+//     const approvedClaims = claims.filter(
+//       (claim) => claim.status_of_approval?.toLowerCase() === 'approved'
+//     ).length;
+//     const approvalRate = Math.round((approvedClaims / totalClaims) * 100);
+
+//     const dealClaims = claims.filter(
+//       (claim) =>
+//         claim.status_of_approval?.toLowerCase() === 'approved' &&
+//         Number(claim.claim_amount) > 50000
+//     ).length;
+//     const dealRate = Math.round((dealClaims / totalClaims) * 100);
+
+//     const currentDate = new Date();
+//     const currentYear = currentDate.getFullYear();
+//     const currentMonth = currentDate.getMonth();
+
+//     const thisMonthClaims = claims.filter((claim) => {
+//       if (!claim.submitted_date) return false;
+//       const claimDate = new Date(claim.submitted_date);
+//       return (
+//         claimDate.getFullYear() === currentYear &&
+//         claimDate.getMonth() === currentMonth
+//       );
+//     }).length;
+
+//     const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+//     const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+//     const prevMonthClaims = claims.filter((claim) => {
+//       if (!claim.submitted_date) return false;
+//       const claimDate = new Date(claim.submitted_date);
+//       return (
+//         claimDate.getFullYear() === prevYear &&
+//         claimDate.getMonth() === prevMonth
+//       );
+//     }).length;
+
+//     let claimTrend = 0;
+//     if (prevMonthClaims > 0) {
+//       claimTrend = Math.round(((thisMonthClaims - prevMonthClaims) / prevMonthClaims) * 1000) / 10;
+//     }
+
+//     return {
+//       approvalRate,
+//       approvalTrend: 'up',
+//       dealRate,
+//       dealTrend: 'down',
+//       claimThisMonth: thisMonthClaims,
+//       claimTrend
+//     };
+//   };
+
+//   if (loading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#4285F4" />
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       <View style={styles.header}>
+//         <Text style={styles.headerTitle}>Expens ez</Text>
+//         <View style={{ position: 'absolute', right: 20, top: 20 }}>
+//           <TouchableOpacity onPress={handleNotification}>
+//             <IonIcon name="notifications-outline" size={28} />
+//             {unreadCount > 0 && (
+//               <View
+//                 style={{
+//                   position: 'absolute',
+//                   top: -4,
+//                   right: -4,
+//                   backgroundColor: 'red',
+//                   borderRadius: 10,
+//                   width: 18,
+//                   height: 18,
+//                   justifyContent: 'center',
+//                   alignItems: 'center',
+//                 }}
+//               >
+//                 <Text style={{ fontSize: 10, fontWeight: 'bold' }}>{unreadCount}</Text>
+//               </View>
+//             )}
+//           </TouchableOpacity>
+//         </View>
+//       </View>
+
+//       <ScrollView>
+//         <View style={styles.greetingCard}>
+//           <Text style={styles.greeting}>{userData.greeting}</Text>
+//           <Text style={styles.userName}>{userData.name}</Text>
+//           <Text style={styles.subGreeting}>Have a delightful day!</Text>
+//         </View>
+
+//         <Text style={styles.sectionTitle}>Expense Analysis</Text>
+
+//         {data.claims.length === 0 ? (
+//           <Text style={{ textAlign: 'center', color: '#999' }}>No claims to display.</Text>
+//         ) : (
+//           <ExpenseHeadChart
+//             claims={data.claims}
+//             policyDetails={data.policy_details_data_sec}
+//           />
+//         )}
+
+//         <View style={styles.claimsContainer}>
+//           <Text style={styles.sectionTitle}>Claims</Text>
+
+//           <View style={styles.statsContainer}>
+//             <View style={styles.statCard}>
+//               <View style={styles.statIconContainer}>
+//                 <Icon name="check-circle" size={24} color="#4285F4" />
+//               </View>
+//               <View style={styles.statContent}>
+//                 <View style={styles.statHeader}>
+//                   <Text style={styles.statValue}>{claimStats.approvalRate}%</Text>
+//                   <View style={styles.trendContainer}>
+//                     <Icon
+//                       name={claimStats.approvalTrend === 'up' ? 'arrow-up' : 'arrow-down'}
+//                       size={16}
+//                       color={claimStats.approvalTrend === 'up' ? '#34A853' : '#EA4335'}
+//                     />
+//                   </View>
+//                 </View>
+//                 <Text style={styles.statLabel}>Approved this month</Text>
+//               </View>
+//             </View>
+
+//             <View style={styles.statCard}>
+//               <View style={styles.statIconContainer}>
+//                 <Icon name="file-document" size={24} color="#34A853" />
+//               </View>
+//               <View style={styles.statContent}>
+//                 <View style={styles.statHeader}>
+//                   <Text style={styles.statValue}>{claimStats.dealRate}%</Text>
+//                   <View style={styles.trendContainer}>
+//                     <Icon
+//                       name={claimStats.dealTrend === 'up' ? 'arrow-up' : 'arrow-down'}
+//                       size={16}
+//                       color={claimStats.dealTrend === 'up' ? '#34A853' : '#EA4335'}
+//                     />
+//                   </View>
+//                 </View>
+//                 <Text style={styles.statLabel}>Rejected this month</Text>
+//               </View>
+//             </View>
+//           </View>
+//         </View>
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#f7f9fc',
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     paddingHorizontal: 20,
+//     paddingVertical: 10,
+//     backgroundColor: '#fff',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f0f0f0',
+//   },
+//   headerTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//   },
+//   greetingCard: {
+//     margin: 20,
+//     padding: 20,
+//     backgroundColor: '#111',
+//     borderRadius: 16,
+//   },
+//   greeting: {
+//     color: '#fff',
+//     opacity: 0.7,
+//     fontSize: 14,
+//   },
+//   userName: {
+//     color: '#fff',
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     marginVertical: 5,
+//   },
+//   subGreeting: {
+//     color: '#fff',
+//     opacity: 0.7,
+//     fontSize: 14,
+//   },
+//   claimsContainer: {
+//     margin: 20,
+//     padding: 20,
+//     backgroundColor: '#fff',
+//     borderRadius: 16,
+//   },
+//   sectionTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     marginBottom: 15,
+//     marginLeft: 20,
+//   },
+//   statsContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginVertical: 15,
+//   },
+//   statCard: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     width: '48%',
+//   },
+//   statIconContainer: {
+//     width: 40,
+//     height: 40,
+//     borderRadius: 20,
+//     backgroundColor: '#f0f0f0',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginRight: 10,
+//   },
+//   statContent: {
+//     flex: 1,
+//   },
+//   statHeader: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   statValue: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//   },
+//   trendContainer: {
+//     marginLeft: 5,
+//   },
+//   statLabel: {
+//     fontSize: 12,
+//     color: '#666',
+//   },
+// });
+
+// export default HomeScreen;
+// import React, { useState, useEffect } from 'react';
+// import {
+//   SafeAreaView,
+//   View,
+//   Text,
+//   StyleSheet,
+//   Dimensions,
+//   ScrollView,
+//   ActivityIndicator,
+//   TouchableOpacity
+// } from 'react-native';
+// import { BarChart } from 'react-native-chart-kit';
+// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import IonIcon from 'react-native-vector-icons/Ionicons';
+// import { BASEPATH } from '../config';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import axios from 'axios';
+// import { useTheme } from 'react-native-paper';
+
+// const HomeScreen = ({ navigation }) => {
+//   const theme = useTheme();
+//   const [unreadCount, setUnreadCount] = useState(0);
+//   const [loading, setLoading] = useState(true);
+//   const [userData, setUserData] = useState({
+//     name: '',
+//     greeting: '',
+//   });
+  
+//   const [expenseData, setExpenseData] = useState({
+//     labels: [],
+//     expenseHeadMap: {}, // Maps expense head IDs to names
+//     chartData: {
+//       labels: [],
+//       approved: [],
+//       rejected: [],
+//       pending: [],
+//     },
+//     isLoading: true,
+//     error: null
+//   });
+
+//   useEffect(() => {
+//     const unsubscribe = navigation.addListener('focus', () => {
+//       getUnreadCount();
+//     });
+
+//     // Get greeting based on time of day
+//     const hour = new Date().getHours();
+//     let greeting = '';
+//     if (hour < 12) greeting = 'Good Morning';
+//     else if (hour < 18) greeting = 'Good Afternoon';
+//     else greeting = 'Good Evening';
+    
+//     // Load user data and expense data
+//     fetchUserData(greeting);
+//     fetchExpenseData();
+
+//     getUnreadCount();
+//     return unsubscribe;
+//   }, [navigation]);
+
+//   const getUnreadCount = async () => {
+//     const count = await AsyncStorage.getItem('unreadCount');
+//     setUnreadCount(parseInt(count || '0', 10));
+//   };
+
+//   const handleNotification = () => {
+//     navigation.navigate('Notifications');
+//   };
+
+//   // Fetch user data
+//   const fetchUserData = async (greeting) => {
+//     try {
+//       const emp_id = await AsyncStorage.getItem('username');
+//       const company_id = await AsyncStorage.getItem('companyname');
+
+//       if (!emp_id || !company_id) {
+//         throw new Error('Missing emp_id or company_id in AsyncStorage');
+//       }
+
+//       const response = await axios.get(`${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`);
+//       const data = response.data;
+      
+//       setUserData({
+//         name: data.name || 'User', // Fallback if name is not provided
+//         greeting: greeting,
+//       });
+//     } catch (error) {
+//       console.error('Error fetching user data:', error);
+//       // Set fallback values in case of error
+//       setUserData({
+//         name: 'User',
+//         greeting: greeting,
+//       });
+//     }
+//   };
+
+//   // Fetch and process expense data for stacked bar chart
+//   const fetchExpenseData = async () => {
+//     try {
+//       const emp_id = await AsyncStorage.getItem('username');
+//       const company_id = await AsyncStorage.getItem('companyname');
+
+//       if (!emp_id || !company_id) {
+//         throw new Error('Missing emp_id or company_id in AsyncStorage');
+//       }
+      
+//       const response = await axios.get(`${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`);
+//       const data = response.data;
+      
+//       // Process expense data for stacked bar chart
+//       const processedData = processExpenseData(data.claims, data.policy_details_data_sec);
+//       setExpenseData({
+//         ...processedData,
+//         isLoading: false,
+//         error: null
+//       });
+      
+//       setLoading(false);
+//     } catch (error) {
+//       console.error('Error fetching expense data:', error);
+//       setExpenseData(prevState => ({
+//         ...prevState,
+//         isLoading: false,
+//         error: 'Failed to load expense data'
+//       }));
+//       setLoading(false);
+//     }
+//   };
+
+//   // Process claims data for stacked bar chart
+//   const processExpenseData = (claims, policyDetails) => {
+//     // Create mapping of expense head IDs to their names
+//     const expenseHeadMap = {};
+//     if (policyDetails && policyDetails.length) {
+//       policyDetails.forEach(policy => {
+//         expenseHeadMap[policy.main_expense_head_id] = policy.expense_head_name;
+//       });
+//     }
+    
+//     // Initialize data structure to track amounts by expense head and status
+//     const expenseHeadData = {};
+    
+//     // Process each claim
+//     if (claims && claims.length) {
+//       claims.forEach(claim => {
+//         const expenseHeadId = claim.expense_head;
+//         const status = claim.status_of_approval || 'pending';
+//         const amount = Number(claim.claim_amount || 0);
+        
+//         // Skip if amount is 0 or expense head is invalid
+//         if (amount <= 0 || !expenseHeadId) return;
+        
+//         // Initialize expense head entry if it doesn't exist
+//         if (!expenseHeadData[expenseHeadId]) {
+//           expenseHeadData[expenseHeadId] = {
+//             approved: 0,
+//             rejected: 0,
+//             pending: 0
+//           };
+//         }
+        
+//         // Add amount to appropriate status category
+//         if (status === 'approved') {
+//           expenseHeadData[expenseHeadId].approved += amount;
+//         } else if (status === 'rejected') {
+//           expenseHeadData[expenseHeadId].rejected += amount;
+//         } else {
+//           expenseHeadData[expenseHeadId].pending += amount;
+//         }
+//       });
+//     }
+    
+//     // Convert to arrays for chart
+//     const expenseHeadIds = Object.keys(expenseHeadData);
+//     const labels = expenseHeadIds.map(id => {
+//       // Use expense head name if available, otherwise use ID
+//       return expenseHeadMap[id] || `Expense ${id}`;
+//     });
+    
+//     const approvedData = expenseHeadIds.map(id => expenseHeadData[id].approved);
+//     const rejectedData = expenseHeadIds.map(id => expenseHeadData[id].rejected);
+//     const pendingData = expenseHeadIds.map(id => expenseHeadData[id].pending);
+    
+//     return {
+//       labels,
+//       expenseHeadMap,
+//       chartData: {
+//         labels,
+//         approved: approvedData,
+//         rejected: rejectedData,
+//         pending: pendingData,
+//       }
+//     };
+//   };
+
+//   // Format number with commas
+//   const formatNumber = (num) => {
+//     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+//   };
+
+//   // Format amount with currency symbol
+//   const formatCurrency = (amount) => {
+//     return `₹ ${formatNumber(amount)}`;
+//   };
+
+//   if (loading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#4285F4" />
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       <View style={styles.header}>
+//         <Text style={styles.headerTitle}>Expens ez</Text>
+//         <View style={{ position: 'absolute', right: 20, top: 20 }}>
+//           <TouchableOpacity onPress={handleNotification}>
+//             <IonIcon name="notifications-outline" size={28} />
+//             {unreadCount > 0 && (
+//               <View
+//                 style={{
+//                   position: 'absolute',
+//                   top: -4,
+//                   right: -4,
+//                   backgroundColor: 'red',
+//                   borderRadius: 10,
+//                   width: 18,
+//                   height: 18,
+//                   justifyContent: 'center',
+//                   alignItems: 'center',
+//                 }}
+//               >
+//                 <Text style={{ fontSize: 10, fontWeight: 'bold', color: 'white' }}>
+//                   {unreadCount}
+//                 </Text>
+//               </View>
+//             )}
+//           </TouchableOpacity>
+//         </View>
+//       </View>
+      
+//       <ScrollView>
+//         {/* User Greeting Card */}
+//         <View style={styles.greetingCard}>
+//           <Text style={styles.greeting}>{userData.greeting}</Text>
+//           <Text style={styles.userName}>{userData.name}</Text>
+//           <Text style={styles.subGreeting}>Have a delightful day!</Text>
+//         </View>
+        
+//         {/* Expense Analysis Section */}
+//         <View style={styles.expenseContainer}>
+//           <Text style={styles.sectionTitle}>Expense Analysis</Text>
+          
+//           {/* Legend */}
+//           <View style={styles.legendContainer}>
+//             <View style={styles.legendItem}>
+//               <View style={[styles.legendDot, { backgroundColor: '#4285F4' }]} />
+//               <Text>Approved</Text>
+//             </View>
+//             <View style={styles.legendItem}>
+//               <View style={[styles.legendDot, { backgroundColor: '#EA4335' }]} />
+//               <Text>Rejected</Text>
+//             </View>
+//             <View style={styles.legendItem}>
+//               <View style={[styles.legendDot, { backgroundColor: '#FBBC05' }]} />
+//               <Text>Pending</Text>
+//             </View>
+//           </View>
+          
+//           {/* Stacked Bar Chart - Render only if data is loaded */}
+//           {/* {!expenseData.isLoading && !expenseData.error && expenseData.chartData.labels.length > 0 ? (
+//             <View style={styles.chartContainer}>
+//               <BarChart
+//                 // data={{
+//                 //   labels: expenseData.chartData.labels.map(label => 
+//                 //     label.length > 8 ? label.substring(0, 6) + '...' : label
+//                 //   ),
+//                 //   legend: ['Approved', 'Rejected', 'Pending'],
+//                 //   data: [
+//                 //     expenseData.chartData.approved,
+//                 //     expenseData.chartData.rejected,
+//                 //     expenseData.chartData.pending
+//                 //   ],
+//                 //   barColors: ['#4285F4', '#EA4335', '#FBBC05']
+//                 // }}
+// //                 data={{
+// //   labels: chartData.labels.map(label => 
+// //     label.length > 8 ? label.substring(0, 6) + '...' : label
+// //   ),
+// //   legend: ['Approved', 'Rejected', 'Pending'],
+// //   data: chartData.labels.map((_, index) => [
+// //     chartData.approved[index] || 0,
+// //     chartData.rejected[index] || 0,
+// //     chartData.pending[index] || 0
+// //   ]),
+// //   barColors: ['#4285F4', '#EA4335', '#FBBC05']
+// // }}
+// // data={{
+// //   labels: chartData.labels.map(label =>
+// //     label.length > 8 ? label.substring(0, 6) + '...' : label
+// //   ),
+// //   legend: ['Approved', 'Rejected', 'Pending'],
+// //   data: chartData.labels.map((_, index) => ([
+// //     chartData.approved?.[index] ?? 0,
+// //     chartData.rejected?.[index] ?? 0,
+// //     chartData.pending?.[index] ?? 0
+// //   ])),
+// //   barColors: ['#4285F4', '#EA4335', '#FBBC05']
+// // }}
+// data={{
+//   labels: expenseData.chartData.labels.map(label =>
+//     label.length > 8 ? label.substring(0, 6) + '...' : label
+//   ),
+//   legend: ['Approved', 'Rejected', 'Pending'],
+//   data: expenseData.chartData.labels.map((_, index) => ([
+//     expenseData.chartData.approved?.[index] ?? 0,
+//     expenseData.chartData.rejected?.[index] ?? 0,
+//     expenseData.chartData.pending?.[index] ?? 0
+//   ])),
+//   barColors: ['#4285F4', '#EA4335', '#FBBC05']
+// }}
+//                 width={Dimensions.get('window').width - 40}
+//                 height={220}
+//                 chartConfig={{
+//                   backgroundColor: '#fff',
+//                   backgroundGradientFrom: '#fff',
+//                   backgroundGradientTo: '#fff',
+//                   decimalPlaces: 0,
+//                   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+//                   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+//                   style: {
+//                     borderRadius: 16,
+//                   },
+//                   barPercentage: 0.8,
+//                   propsForLabels: {
+//                     fontSize: 10,
+//                     rotation: -45,
+//                   },
+//                   propsForBackgroundLines: {
+//                     strokeWidth: 1,
+//                     stroke: '#e0e0e0',
+//                   },
+//                   formatYLabel: (value) => `₹${value}`,
+//                   formatTopValue: (value) => `₹${value}`,
+//                 }}
+//                 style={styles.chart}
+//                 withHorizontalLabels={true}
+//                 showValuesOnTopOfBars={false}
+//                 segments={4}
+//               />
+//             </View>
+//           ) : expenseData.chartData.labels.length === 0 && !expenseData.isLoading ? (
+//             <View style={styles.noDataContainer}>
+//               <Icon name="chart-bar" size={50} color="#ccc" />
+//               <Text style={styles.noDataText}>No expense data available</Text>
+//             </View>
+//           ) : null} */}
+//           {!expenseData.isLoading &&
+//   !expenseData.error &&
+//   expenseData.chartData &&
+//   expenseData.chartData.labels &&
+//   expenseData.chartData.labels.length > 0 && (
+//     <View style={styles.chartContainer}>
+//       <BarChart
+//         data={{
+//           labels: expenseData.chartData.labels.map(label =>
+//             label.length > 8 ? label.substring(0, 6) + '...' : label
+//           ),
+//           legend: ['Approved', 'Rejected', 'Pending'],
+//           data: expenseData.chartData.labels.map((_, index) => [
+//             expenseData.chartData.approved?.[index] ?? 0,
+//             expenseData.chartData.rejected?.[index] ?? 0,
+//             expenseData.chartData.pending?.[index] ?? 0
+//           ]),
+//           barColors: ['#4285F4', '#EA4335', '#FBBC05']
+//         }}
+//         width={Dimensions.get('window').width - 40}
+//         height={220}
+//         chartConfig={{
+//           backgroundColor: '#fff',
+//           backgroundGradientFrom: '#fff',
+//           backgroundGradientTo: '#fff',
+//           decimalPlaces: 0,
+//           color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+//           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+//           style: {
+//             borderRadius: 16,
+//           },
+//           barPercentage: 0.8,
+//           propsForLabels: {
+//             fontSize: 10,
+//             rotation: -45,
+//           },
+//           propsForBackgroundLines: {
+//             strokeWidth: 1,
+//             stroke: '#e0e0e0',
+//           },
+//           formatYLabel: (value) => `₹${value}`,
+//           formatTopValue: (value) => `₹${value}`,
+//         }}
+//         style={styles.chart}
+//         withHorizontalLabels={true}
+//         showValuesOnTopOfBars={false}
+//         segments={4}
+//       />
+//     </View>
+// )}
+
+//           {/* Show error message if data loading failed */}
+//           {expenseData.error && (
+//             <View style={styles.errorContainer}>
+//               <Text style={styles.errorText}>{expenseData.error}</Text>
+//             </View>
+//           )}
+          
+//           {/* Expense Breakdown */}
+//           {!expenseData.isLoading && !expenseData.error && expenseData.chartData.labels.length > 0 && (
+//             <View style={styles.expenseBreakdown}>
+//               <Text style={styles.breakdownTitle}>Expense Breakdown</Text>
+              
+//               {expenseData.chartData.labels.map((label, index) => {
+//                 const approved = expenseData.chartData.approved[index] || 0;
+//                 const rejected = expenseData.chartData.rejected[index] || 0;
+//                 const pending = expenseData.chartData.pending[index] || 0;
+//                 const total = approved + rejected + pending;
+                
+//                 return (
+//                   <View key={index} style={styles.expenseItem}>
+//                     <Text style={styles.expenseItemTitle}>{label}</Text>
+                    
+//                     <View style={styles.expenseItemDetails}>
+//                       <View style={styles.expenseStatusItem}>
+//                         <View style={styles.expenseStatusHeader}>
+//                           <View style={[styles.statusIndicator, { backgroundColor: '#4285F4' }]} />
+//                           <Text style={styles.expenseStatusLabel}>Approved</Text>
+//                         </View>
+//                         <Text style={styles.expenseStatusValue}>{formatCurrency(approved)}</Text>
+//                       </View>
+                      
+//                       <View style={styles.expenseStatusItem}>
+//                         <View style={styles.expenseStatusHeader}>
+//                           <View style={[styles.statusIndicator, { backgroundColor: '#EA4335' }]} />
+//                           <Text style={styles.expenseStatusLabel}>Rejected</Text>
+//                         </View>
+//                         <Text style={styles.expenseStatusValue}>{formatCurrency(rejected)}</Text>
+//                       </View>
+                      
+//                       <View style={styles.expenseStatusItem}>
+//                         <View style={styles.expenseStatusHeader}>
+//                           <View style={[styles.statusIndicator, { backgroundColor: '#FBBC05' }]} />
+//                           <Text style={styles.expenseStatusLabel}>Pending</Text>
+//                         </View>
+//                         <Text style={styles.expenseStatusValue}>{formatCurrency(pending)}</Text>
+//                       </View>
+                      
+//                       <View style={[styles.expenseStatusItem, styles.totalItem]}>
+//                         <Text style={styles.totalLabel}>Total</Text>
+//                         <Text style={styles.totalValue}>{formatCurrency(total)}</Text>
+//                       </View>
+//                     </View>
+//                   </View>
+//                 );
+//               })}
+//             </View>
+//           )}
+//         </View>
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#f7f9fc',
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingVertical: 10,
+//     backgroundColor: '#fff',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f0f0f0',
+//   },
+//   headerTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//   },
+//   greetingCard: {
+//     margin: 20,
+//     padding: 20,
+//     backgroundColor: '#111',
+//     borderRadius: 16,
+//   },
+//   greeting: {
+//     color: '#fff',
+//     opacity: 0.7,
+//     fontSize: 14,
+//   },
+//   userName: {
+//     color: '#fff',
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     marginVertical: 5,
+//   },
+//   subGreeting: {
+//     color: '#fff',
+//     opacity: 0.7,
+//     fontSize: 14,
+//   },
+//   expenseContainer: {
+//     margin: 20,
+//     padding: 20,
+//     backgroundColor: '#fff',
+//     borderRadius: 16,
+//   },
+//   sectionTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     marginBottom: 15,
+//   },
+//   legendContainer: {
+//     flexDirection: 'row',
+//     marginBottom: 10,
+//   },
+//   legendItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginRight: 20,
+//   },
+//   legendDot: {
+//     width: 10,
+//     height: 10,
+//     borderRadius: 5,
+//     marginRight: 5,
+//   },
+//   chartContainer: {
+//     marginVertical: 10,
+//     alignItems: 'center',
+//     paddingVertical: 10,
+//   },
+//   chart: {
+//     borderRadius: 16,
+//     paddingRight: 0,
+//   },
+//   noDataContainer: {
+//     alignItems: 'center',
+//     paddingVertical: 40,
+//   },
+//   noDataText: {
+//     marginTop: 10,
+//     fontSize: 16,
+//     color: '#666',
+//   },
+//   errorContainer: {
+//     alignItems: 'center',
+//     padding: 20,
+//   },
+//   errorText: {
+//     color: '#EA4335',
+//     fontSize: 14,
+//   },
+//   expenseBreakdown: {
+//     marginTop: 20,
+//     borderTopWidth: 1,
+//     borderTopColor: '#f0f0f0',
+//     paddingTop: 15,
+//   },
+//   breakdownTitle: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     marginBottom: 15,
+//   },
+//   expenseItem: {
+//     marginBottom: 20,
+//     padding: 15,
+//     backgroundColor: '#f8f9fa',
+//     borderRadius: 12,
+//   },
+//   expenseItemTitle: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     marginBottom: 10,
+//   },
+//   expenseItemDetails: {
+//     marginTop: 5,
+//   },
+//   expenseStatusItem: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingVertical: 8,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//   },
+//   expenseStatusHeader: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   statusIndicator: {
+//     width: 8,
+//     height: 8,
+//     borderRadius: 4,
+//     marginRight: 8,
+//   },
+//   expenseStatusLabel: {
+//     fontSize: 14,
+//     color: '#555',
+//   },
+//   expenseStatusValue: {
+//     fontSize: 14,
+//     fontWeight: '500',
+//   },
+//   totalItem: {
+//     borderBottomWidth: 0,
+//     marginTop: 5,
+//   },
+//   totalLabel: {
+//     fontSize: 15,
+//     fontWeight: 'bold',
+//   },
+//   totalValue: {
+//     fontSize: 15,
+//     fontWeight: 'bold',
+//   },
+// });
+
+// export default HomeScreen;
+
+// import React, { useState, useEffect } from 'react';
+// import {
+//   View,
+//   Text,
+//   StyleSheet,
+//   ScrollView,
+//   TouchableOpacity,
+//   ActivityIndicator,
+//   RefreshControl,
+//   SafeAreaView
+// } from 'react-native';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+// import ExpenseHeadChart from './ExpenseHeadChart';
+
+// const HomeScreen = ({ navigation }) => {
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [refreshing, setRefreshing] = useState(false);
+//   const [dashboardData, setDashboardData] = useState({
+//     claims: [],
+//     policyDetails: [],
+//     summary: {
+//       totalClaims: 0,
+//       pendingClaims: 0,
+//       approvedClaims: 0,
+//       rejectedClaims: 0,
+//       totalAmount: 0,
+//       pendingAmount: 0,
+//       approvedAmount: 0,
+//       rejectedAmount: 0
+//     }
+//   });
+
+//   // Fetch dashboard data on component mount and when refreshing
+//   useEffect(() => {
+//     fetchDashboardData();
+//   }, []);
+
+//   const fetchDashboardData = async () => {
+//     setIsLoading(true);
+//     try {
+//       // In a real app, this would be an API call
+//       // For now, we'll use mock data
+//       const mockData = generateMockData();
+      
+//       // Simulate network delay
+//       setTimeout(() => {
+//         setDashboardData(mockData);
+//         setIsLoading(false);
+//         setRefreshing(false);
+//       }, 1000);
+//     } catch (error) {
+//       console.error('Error fetching dashboard data:', error);
+//       setIsLoading(false);
+//       setRefreshing(false);
+//     }
+//   };
+
+//   const onRefresh = () => {
+//     setRefreshing(true);
+//     fetchDashboardData();
+//   };
+
+//   // Generate mock data for testing
+//   const generateMockData = () => {
+//     // Generate expense head policies
+//     const expenseHeads = [
+//       { main_expense_head_id: '1', expense_head_name: 'Travel' },
+//       { main_expense_head_id: '2', expense_head_name: 'Meals' },
+//       { main_expense_head_id: '3', expense_head_name: 'Accommodation' },
+//       { main_expense_head_id: '4', expense_head_name: 'Office Supplies' }
+//     ];
+
+//     // Generate random claims
+//     const statuses = ['approved', 'rejected', 'pending'];
+//     const mockClaims = Array(30).fill().map((_, i) => {
+//       const expenseHeadId = Math.floor(Math.random() * 4 + 1).toString();
+//       const status = statuses[Math.floor(Math.random() * statuses.length)];
+//       const amount = Math.floor(Math.random() * 10000) + 500;
+      
+//       return {
+//         id: `claim-${i}`,
+//         expense_head: expenseHeadId,
+//         claim_amount: amount,
+//         status_of_approval: status,
+//         created_at: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString()
+//       };
+//     });
+
+//     // Calculate summary data
+//     const summary = {
+//       totalClaims: mockClaims.length,
+//       pendingClaims: mockClaims.filter(c => c.status_of_approval === 'pending').length,
+//       approvedClaims: mockClaims.filter(c => c.status_of_approval === 'approved').length,
+//       rejectedClaims: mockClaims.filter(c => c.status_of_approval === 'rejected').length,
+//       totalAmount: mockClaims.reduce((sum, claim) => sum + Number(claim.claim_amount), 0),
+//       pendingAmount: mockClaims.filter(c => c.status_of_approval === 'pending')
+//         .reduce((sum, claim) => sum + Number(claim.claim_amount), 0),
+//       approvedAmount: mockClaims.filter(c => c.status_of_approval === 'approved')
+//         .reduce((sum, claim) => sum + Number(claim.claim_amount), 0),
+//       rejectedAmount: mockClaims.filter(c => c.status_of_approval === 'rejected')
+//         .reduce((sum, claim) => sum + Number(claim.claim_amount), 0)
+//     };
+
+//     return {
+//       claims: mockClaims,
+//       policyDetails: expenseHeads,
+//       summary
+//     };
+//   };
+
+//   // Format currency
+//   const formatCurrency = (amount) => {
+//     return `₹ ${amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+//   };
+
+//   if (isLoading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#4285F4" />
+//         <Text style={styles.loadingText}>Loading dashboard...</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       <View style={styles.header}>
+//         <Text style={styles.headerTitle}>Expense Dashboard</Text>
+//         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+//           <Icon name="account-circle" size={30} color="#333" />
+//         </TouchableOpacity>
+//       </View>
+
+//       <ScrollView
+//         contentContainerStyle={styles.scrollContent}
+//         refreshControl={
+//           <RefreshControl
+//             refreshing={refreshing}
+//             onRefresh={onRefresh}
+//             colors={['#4285F4']}
+//           />
+//         }
+//       >
+//         {/* Summary Cards */}
+//         <View style={styles.summaryContainer}>
+//           <View style={styles.summaryRow}>
+//             <View style={[styles.summaryCard, { backgroundColor: '#E8F0FE' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.totalClaims}</Text>
+//               <Text style={styles.summaryLabel}>Total Claims</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.totalAmount)}</Text>
+//             </View>
+            
+//             <View style={[styles.summaryCard, { backgroundColor: '#FEF7E0' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.pendingClaims}</Text>
+//               <Text style={styles.summaryLabel}>Pending</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.pendingAmount)}</Text>
+//             </View>
+//           </View>
+          
+//           <View style={styles.summaryRow}>
+//             <View style={[styles.summaryCard, { backgroundColor: '#E6F4EA' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.approvedClaims}</Text>
+//               <Text style={styles.summaryLabel}>Approved</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.approvedAmount)}</Text>
+//             </View>
+            
+//             <View style={[styles.summaryCard, { backgroundColor: '#FCE8E6' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.rejectedClaims}</Text>
+//               <Text style={styles.summaryLabel}>Rejected</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.rejectedAmount)}</Text>
+//             </View>
+//           </View>
+//         </View>
+
+//         {/* Quick Action Buttons */}
+//         <View style={styles.quickActionsContainer}>
+//           <Text style={styles.sectionTitle}>Quick Actions</Text>
+//           <View style={styles.quickActionButtons}>
+//             <TouchableOpacity 
+//               style={styles.actionButton}
+//               onPress={() => navigation.navigate('NewClaim')}
+//             >
+//               <View style={[styles.actionIcon, { backgroundColor: '#4285F4' }]}>
+//                 <Icon name="add" size={24} color="#fff" />
+//               </View>
+//               <Text style={styles.actionText}>New Claim</Text>
+//             </TouchableOpacity>
+            
+//             <TouchableOpacity 
+//               style={styles.actionButton}
+//               onPress={() => navigation.navigate('ClaimHistory')}
+//             >
+//               <View style={[styles.actionIcon, { backgroundColor: '#0F9D58' }]}>
+//                 <Icon name="history" size={24} color="#fff" />
+//               </View>
+//               <Text style={styles.actionText}>History</Text>
+//             </TouchableOpacity>
+            
+//             <TouchableOpacity 
+//               style={styles.actionButton}
+//               onPress={() => navigation.navigate('ExpensePolicy')}
+//             >
+//               <View style={[styles.actionIcon, { backgroundColor: '#F4B400' }]}>
+//                 <Icon name="description" size={24} color="#fff" />
+//               </View>
+//               <Text style={styles.actionText}>Policy</Text>
+//             </TouchableOpacity>
+//           </View>
+//         </View>
+
+//         {/* Expense Chart */}
+//         <ExpenseHeadChart 
+//           claims={dashboardData.claims} 
+//           policyDetails={dashboardData.policyDetails} 
+//         />
+
+//         {/* Recent Transactions */}
+//         <View style={styles.recentTransactionsContainer}>
+//           <View style={styles.sectionTitleRow}>
+//             <Text style={styles.sectionTitle}>Recent Claims</Text>
+//             <TouchableOpacity onPress={() => navigation.navigate('ClaimHistory')}>
+//               <Text style={styles.viewAllText}>View All</Text>
+//             </TouchableOpacity>
+//           </View>
+
+//           {dashboardData.claims.slice(0, 5).map((claim, index) => {
+//             const expenseHead = dashboardData.policyDetails.find(
+//               p => p.main_expense_head_id === claim.expense_head
+//             );
+            
+//             let statusColor = '#FBBC05'; // Pending
+//             if (claim.status_of_approval === 'approved') statusColor = '#4285F4';
+//             if (claim.status_of_approval === 'rejected') statusColor = '#EA4335';
+            
+//             return (
+//               <TouchableOpacity 
+//                 key={claim.id} 
+//                 style={styles.transactionItem}
+//                 onPress={() => navigation.navigate('ClaimDetails', { claimId: claim.id })}
+//               >
+//                 <View style={styles.transactionLeft}>
+//                   <View style={[styles.categoryIcon, { backgroundColor: statusColor + '20' }]}>
+//                     <Icon 
+//                       name={
+//                         expenseHead?.expense_head_name === 'Travel' ? 'flight' :
+//                         expenseHead?.expense_head_name === 'Meals' ? 'restaurant' :
+//                         expenseHead?.expense_head_name === 'Accommodation' ? 'hotel' :
+//                         'shopping-bag'
+//                       } 
+//                       size={20} 
+//                       color={statusColor} 
+//                     />
+//                   </View>
+//                   <View>
+//                     <Text style={styles.transactionTitle}>
+//                       {expenseHead?.expense_head_name || `Expense ${claim.expense_head}`}
+//                     </Text>
+//                     <Text style={styles.transactionDate}>
+//                       {new Date(claim.created_at).toLocaleDateString()}
+//                     </Text>
+//                   </View>
+//                 </View>
+//                 <View style={styles.transactionRight}>
+//                   <Text style={styles.transactionAmount}>
+//                     {formatCurrency(claim.claim_amount)}
+//                   </Text>
+//                   <View style={[styles.statusBadge, { backgroundColor: statusColor + '20' }]}>
+//                     <Text style={[styles.statusText, { color: statusColor }]}>
+//                       {claim.status_of_approval.charAt(0).toUpperCase() + claim.status_of_approval.slice(1)}
+//                     </Text>
+//                   </View>
+//                 </View>
+//               </TouchableOpacity>
+//             );
+//           })}
+//         </View>
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#f5f5f5',
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: '#f5f5f5',
+//   },
+//   loadingText: {
+//     marginTop: 10,
+//     color: '#333',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingVertical: 15,
+//     backgroundColor: '#fff',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//   },
+//   headerTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     color: '#333',
+//   },
+//   scrollContent: {
+//     padding: 15,
+//   },
+//   summaryContainer: {
+//     marginBottom: 20,
+//   },
+//   summaryRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginBottom: 10,
+//   },
+//   summaryCard: {
+//     width: '48%',
+//     borderRadius: 12,
+//     padding: 15,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   summaryValue: {
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     color: '#333',
+//     marginBottom: 4,
+//   },
+//   summaryLabel: {
+//     fontSize: 14,
+//     color: '#666',
+//     marginBottom: 6,
+//   },
+//   summaryAmount: {
+//     fontSize: 16,
+//     fontWeight: '500',
+//     color: '#333',
+//   },
+//   quickActionsContainer: {
+//     backgroundColor: '#fff',
+//     borderRadius: 12,
+//     padding: 15,
+//     marginBottom: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   sectionTitle: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     color: '#333',
+//     marginBottom: 10,
+//   },
+//   quickActionButtons: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//   },
+//   actionButton: {
+//     alignItems: 'center',
+//     width: '30%',
+//   },
+//   actionIcon: {
+//     width: 50,
+//     height: 50,
+//     borderRadius: 25,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginBottom: 8,
+//   },
+//   actionText: {
+//     fontSize: 14,
+//     color: '#333',
+//   },
+//   recentTransactionsContainer: {
+//     backgroundColor: '#fff',
+//     borderRadius: 12,
+//     padding: 15,
+//     marginTop: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   sectionTitleRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 15,
+//   },
+//   viewAllText: {
+//     color: '#4285F4',
+//     fontSize: 14,
+//   },
+//   transactionItem: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     paddingVertical: 12,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f0f0f0',
+//   },
+//   transactionLeft: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   categoryIcon: {
+//     width: 40,
+//     height: 40,
+//     borderRadius: 20,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginRight: 12,
+//   },
+//   transactionTitle: {
+//     fontSize: 15,
+//     fontWeight: '500',
+//     color: '#333',
+//     marginBottom: 4,
+//   },
+//   transactionDate: {
+//     fontSize: 12,
+//     color: '#888',
+//   },
+//   transactionRight: {
+//     alignItems: 'flex-end',
+//   },
+//   transactionAmount: {
+//     fontSize: 15,
+//     fontWeight: '500',
+//     color: '#333',
+//     marginBottom: 4,
+//   },
+//   statusBadge: {
+//     paddingHorizontal: 8,
+//     paddingVertical: 3,
+//     borderRadius: 12,
+//   },
+//   statusText: {
+//     fontSize: 12,
+//     fontWeight: '500',
+//   }
+// });
+
+// export default HomeScreen;
+
+// import React, { useState, useEffect } from 'react';
+// import {
+//   View,
+//   Text,
+//   StyleSheet,
+//   ScrollView,
+//   TouchableOpacity,
+//   ActivityIndicator,
+//   RefreshControl,
+//   SafeAreaView
+// } from 'react-native';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+// import ExpenseHeadChart from './ExpenseHeadChart';
+
+// const HomeScreen = ({ navigation }) => {
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [refreshing, setRefreshing] = useState(false);
+//   const [dashboardData, setDashboardData] = useState({
+//     claims: [],
+//     policyDetails: [],
+//     summary: {
+//       totalClaims: 0,
+//       pendingClaims: 0,
+//       approvedClaims: 0,
+//       rejectedClaims: 0,
+//       totalAmount: 0,
+//       pendingAmount: 0,
+//       approvedAmount: 0,
+//       rejectedAmount: 0
+//     }
+//   });
+
+//   // Fetch dashboard data on component mount and when refreshing
+//   useEffect(() => {
+//     fetchDashboardData();
+//   }, []);
+
+//   const fetchDashboardData = async () => {
+//     setIsLoading(true);
+//     try {
+//       // In a real app, this would be an API call
+//       // For now, we'll use mock data
+//       const mockData = generateMockData();
+      
+//       // Simulate network delay
+//       setTimeout(() => {
+//         // Ensure data structure is complete before updating state
+//         const safeData = {
+//           claims: mockData.claims || [],
+//           policyDetails: mockData.policyDetails || [],
+//           summary: mockData.summary || {
+//             totalClaims: 0,
+//             pendingClaims: 0,
+//             approvedClaims: 0,
+//             rejectedClaims: 0,
+//             totalAmount: 0,
+//             pendingAmount: 0,
+//             approvedAmount: 0,
+//             rejectedAmount: 0
+//           }
+//         };
+//         setDashboardData(safeData);
+//         setIsLoading(false);
+//         setRefreshing(false);
+//       }, 1000);
+//     } catch (error) {
+//       console.error('Error fetching dashboard data:', error);
+//       setIsLoading(false);
+//       setRefreshing(false);
+//     }
+//   };
+
+//   const onRefresh = () => {
+//     setRefreshing(true);
+//     fetchDashboardData();
+//   };
+
+//   // Generate mock data for testing
+//   const generateMockData = () => {
+//     // Generate expense head policies
+//     const expenseHeads = [
+//       { main_expense_head_id: '1', expense_head_name: 'Travel' },
+//       { main_expense_head_id: '2', expense_head_name: 'Meals' },
+//       { main_expense_head_id: '3', expense_head_name: 'Accommodation' },
+//       { main_expense_head_id: '4', expense_head_name: 'Office Supplies' }
+//     ];
+
+//     // Generate random claims
+//     const statuses = ['approved', 'rejected', 'pending'];
+//     const mockClaims = Array(30).fill().map((_, i) => {
+//       const expenseHeadId = Math.floor(Math.random() * 4 + 1).toString();
+//       const status = statuses[Math.floor(Math.random() * statuses.length)];
+//       const amount = Math.floor(Math.random() * 10000) + 500;
+      
+//       return {
+//         id: `claim-${i}`,
+//         expense_head: expenseHeadId,
+//         claim_amount: amount,
+//         status_of_approval: status,
+//         created_at: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString()
+//       };
+//     });
+
+//     // Calculate summary data
+//     const summary = {
+//       totalClaims: mockClaims.length,
+//       pendingClaims: mockClaims.filter(c => c.status_of_approval === 'pending').length,
+//       approvedClaims: mockClaims.filter(c => c.status_of_approval === 'approved').length,
+//       rejectedClaims: mockClaims.filter(c => c.status_of_approval === 'rejected').length,
+//       totalAmount: mockClaims.reduce((sum, claim) => sum + Number(claim.claim_amount), 0),
+//       pendingAmount: mockClaims.filter(c => c.status_of_approval === 'pending')
+//         .reduce((sum, claim) => sum + Number(claim.claim_amount), 0),
+//       approvedAmount: mockClaims.filter(c => c.status_of_approval === 'approved')
+//         .reduce((sum, claim) => sum + Number(claim.claim_amount), 0),
+//       rejectedAmount: mockClaims.filter(c => c.status_of_approval === 'rejected')
+//         .reduce((sum, claim) => sum + Number(claim.claim_amount), 0)
+//     };
+
+//     return {
+//       claims: mockClaims,
+//       policyDetails: expenseHeads,
+//       summary
+//     };
+//   };
+
+//   // Format currency
+//   const formatCurrency = (amount) => {
+//     return `₹ ${amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+//   };
+
+//   if (isLoading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#4285F4" />
+//         <Text style={styles.loadingText}>Loading dashboard...</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       <View style={styles.header}>
+//         <Text style={styles.headerTitle}>Expense Dashboard</Text>
+//         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+//           <Icon name="account-circle" size={30} color="#333" />
+//         </TouchableOpacity>
+//       </View>
+
+//       <ScrollView
+//         contentContainerStyle={styles.scrollContent}
+//         refreshControl={
+//           <RefreshControl
+//             refreshing={refreshing}
+//             onRefresh={onRefresh}
+//             colors={['#4285F4']}
+//           />
+//         }
+//       >
+//         {/* Summary Cards */}
+//         <View style={styles.summaryContainer}>
+//           <View style={styles.summaryRow}>
+//             <View style={[styles.summaryCard, { backgroundColor: '#E8F0FE' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.totalClaims}</Text>
+//               <Text style={styles.summaryLabel}>Total Claims</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.totalAmount)}</Text>
+//             </View>
+            
+//             <View style={[styles.summaryCard, { backgroundColor: '#FEF7E0' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.pendingClaims}</Text>
+//               <Text style={styles.summaryLabel}>Pending</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.pendingAmount)}</Text>
+//             </View>
+//           </View>
+          
+//           <View style={styles.summaryRow}>
+//             <View style={[styles.summaryCard, { backgroundColor: '#E6F4EA' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.approvedClaims}</Text>
+//               <Text style={styles.summaryLabel}>Approved</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.approvedAmount)}</Text>
+//             </View>
+            
+//             <View style={[styles.summaryCard, { backgroundColor: '#FCE8E6' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.rejectedClaims}</Text>
+//               <Text style={styles.summaryLabel}>Rejected</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.rejectedAmount)}</Text>
+//             </View>
+//           </View>
+//         </View>
+
+        
+
+//         {/* Expense Chart */}
+//         <ExpenseHeadChart 
+//           claims={dashboardData.claims} 
+//           policyDetails={dashboardData.policyDetails} 
+//         />
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#f5f5f5',
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: '#f5f5f5',
+//   },
+//   loadingText: {
+//     marginTop: 10,
+//     color: '#333',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingVertical: 15,
+//     backgroundColor: '#fff',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//   },
+//   headerTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     color: '#333',
+//   },
+//   scrollContent: {
+//     padding: 15,
+//   },
+//   summaryContainer: {
+//     marginBottom: 20,
+//   },
+//   summaryRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginBottom: 10,
+//   },
+//   summaryCard: {
+//     width: '48%',
+//     borderRadius: 12,
+//     padding: 15,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   summaryValue: {
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     color: '#333',
+//     marginBottom: 4,
+//   },
+//   summaryLabel: {
+//     fontSize: 14,
+//     color: '#666',
+//     marginBottom: 6,
+//   },
+//   summaryAmount: {
+//     fontSize: 16,
+//     fontWeight: '500',
+//     color: '#333',
+//   },
+//   quickActionsContainer: {
+//     backgroundColor: '#fff',
+//     borderRadius: 12,
+//     padding: 15,
+//     marginBottom: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   sectionTitle: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     color: '#333',
+//     marginBottom: 10,
+//   },
+//   quickActionButtons: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//   },
+//   actionButton: {
+//     alignItems: 'center',
+//     width: '30%',
+//   },
+//   actionIcon: {
+//     width: 50,
+//     height: 50,
+//     borderRadius: 25,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginBottom: 8,
+//   },
+//   actionText: {
+//     fontSize: 14,
+//     color: '#333',
+//   },
+//   recentTransactionsContainer: {
+//     backgroundColor: '#fff',
+//     borderRadius: 12,
+//     padding: 15,
+//     marginTop: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   sectionTitleRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 15,
+//   },
+//   viewAllText: {
+//     color: '#4285F4',
+//     fontSize: 14,
+//   },
+//   transactionItem: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     paddingVertical: 12,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f0f0f0',
+//   },
+//   transactionLeft: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   categoryIcon: {
+//     width: 40,
+//     height: 40,
+//     borderRadius: 20,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginRight: 12,
+//   },
+//   transactionTitle: {
+//     fontSize: 15,
+//     fontWeight: '500',
+//     color: '#333',
+//     marginBottom: 4,
+//   },
+//   transactionDate: {
+//     fontSize: 12,
+//     color: '#888',
+//   },
+//   transactionRight: {
+//     alignItems: 'flex-end',
+//   },
+//   transactionAmount: {
+//     fontSize: 15,
+//     fontWeight: '500',
+//     color: '#333',
+//     marginBottom: 4,
+//   },
+//   statusBadge: {
+//     paddingHorizontal: 8,
+//     paddingVertical: 3,
+//     borderRadius: 12,
+//   },
+//   statusText: {
+//     fontSize: 12,
+//     fontWeight: '500',
+//   },
+//   noDataText: {
+//     textAlign: 'center',
+//     color: '#888',
+//     padding: 15,
+//   }
+// });
+
+// export default HomeScreen;
+
+// import React, { useState, useEffect } from 'react';
+// import {
+//   View,
+//   Text,
+//   StyleSheet,
+//   ScrollView,
+//   TouchableOpacity,
+//   ActivityIndicator,
+//   RefreshControl,
+//   SafeAreaView
+// } from 'react-native';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+// import axios from 'axios';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import ExpenseHeadChart from './ExpenseHeadChart';
+// import { BASEPATH } from '../config';
+
+// const HomeScreen = ({ navigation }) => {
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [refreshing, setRefreshing] = useState(false);
+//   const [dashboardData, setDashboardData] = useState({
+//     claims: [],
+//     policyDetails: [],
+//     summary: {
+//       totalClaims: 0,
+//       pendingClaims: 0,
+//       approvedClaims: 0,
+//       rejectedClaims: 0,
+//       totalAmount: 0,
+//       pendingAmount: 0,
+//       approvedAmount: 0,
+//       rejectedAmount: 0
+//     }
+//   });
+
+//   useEffect(() => {
+//     fetchDashboardData();
+//   }, []);
+
+//   const fetchDashboardData = async () => {
+//     setIsLoading(true);
+//     try {
+//       const emp_id = await AsyncStorage.getItem('username');
+//       const company_id = await AsyncStorage.getItem('companyname');
+
+//       if (!emp_id || !company_id) {
+//         throw new Error('Missing emp_id or company_id');
+//       }
+
+//       const response = await axios.get(
+//         `${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`
+//       );
+
+//       const claims = response.data.claims || [];
+//       const policyDetails = response.data.approval_claim_data.policy_details_data_sec || [];
+
+//       // Attach policy details to claims
+//       const updatedClaims = claims.map(claim => {
+//         const match = policyDetails.find(policy =>
+//           String(policy.policy_detail_id) === String(claim.policy_id) &&
+//           String(policy.main_expense_head_id) === String(claim.expense_head) &&
+//           String(policy.sub_expense_head_id) === String(claim.subexpense_head)
+//         );
+
+//         return {
+//           ...claim,
+//           expense_head_name: match?.expense_head_name || 'N/A',
+//           sub_expense_head_name: match?.sub_expense_head_name || 'N/A',
+//         };
+//       });
+
+//       // Generate summary
+//       // const summary = {
+//       //   totalClaims: updatedClaims.length,
+//       //   pendingClaims: updatedClaims.filter(c => c.status_of_approval === 'pending').length,
+//       //   approvedClaims: updatedClaims.filter(c => c.status_of_approval === 'approved').length,
+//       //   rejectedClaims: updatedClaims.filter(c => c.status_of_approval === 'rejected').length,
+//       //   totalAmount: updatedClaims.reduce((sum, c) => sum + Number(c.claim_amount || 0), 0),
+//       //   pendingAmount: updatedClaims.filter(c => c.status_of_approval === 'pending')
+//       //     .reduce((sum, c) => sum + Number(c.claim_amount || 0), 0),
+//       //   approvedAmount: updatedClaims.filter(c => c.status_of_approval === 'approved')
+//       //     .reduce((sum, c) => sum + Number(c.claim_amount || 0), 0),
+//       //   rejectedAmount: updatedClaims.filter(c => c.status_of_approval === 'rejected')
+//       //     .reduce((sum, c) => sum + Number(c.claim_amount || 0), 0)
+//       // };
+// const roundToTwo = (num) => {
+//   return Math.round(num * 100) / 100;
+// };
+
+// // const summary = {
+// //   totalClaims: updatedClaims.length,
+// //   pendingClaims: updatedClaims.filter(c => c.status_of_approval?.toLowerCase().trim() === 'pending').length,
+// //   approvedClaims: updatedClaims.filter(c => c.status_of_approval?.toLowerCase().trim() === 'approved').length,
+// //   rejectedClaims: updatedClaims.filter(c => c.status_of_approval?.toLowerCase().trim() === 'rejected').length,
+  
+// //   totalAmount: roundToTwo(updatedClaims.reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+  
+// //   pendingAmount: roundToTwo(updatedClaims.filter(c => c.status_of_approval?.toLowerCase().trim() === 'pending')
+// //     .reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+    
+// //   approvedAmount: roundToTwo(updatedClaims.filter(c => c.status_of_approval?.toLowerCase().trim() === 'approved')
+// //     .reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+    
+// //   rejectedAmount: roundToTwo(updatedClaims.filter(c => c.status_of_approval?.toLowerCase().trim() === 'rejected')
+// //     .reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+// // };
+// // const normalizeStatus = (status) => status?.toString().toLowerCase().trim();
+// // const safeAmount = (amount) => {
+// //   const num = Number(amount);
+// //   return isNaN(num) ? 0 : num;
+// // };
+// const safeAmount = (claim) => {
+//   // Try claim_amount first; fallback to approved_amount or rejected_amount if applicable
+//   const amount = claim.claim_amount ?? claim.approved_amount ?? claim.rejected_amount ?? 0;
+//   const num = Number(amount);
+//   return isNaN(num) ? 0 : num;
+// };
+
+// console.log('Claims grouped by status and amounts:');
+
+// ['pending', 'approved', 'rejected'].forEach(status => {
+//   const filtered = updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === status);
+//   console.log(`${status} claims count:`, filtered.length);
+//   console.log(`${status} claims amounts:`, filtered.map(c => c.claim_amount));
+// });
+
+// const summary = {
+//   totalClaims: updatedClaims.length,
+//   pendingClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'pending').length,
+//   approvedClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'approved').length,
+//   rejectedClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'rejected').length,
+
+//   // totalAmount: roundToTwo(updatedClaims.reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+
+//   // pendingAmount: roundToTwo(updatedClaims
+//   //   .filter(c => normalizeStatus(c.status_of_approval) === 'pending')
+//   //   .reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+
+//   // approvedAmount: roundToTwo(updatedClaims
+//   //   .filter(c => normalizeStatus(c.status_of_approval) === 'approved')
+//   //   .reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+
+//   // rejectedAmount: roundToTwo(updatedClaims
+//   //   .filter(c => normalizeStatus(c.status_of_approval) === 'rejected')
+//   //   .reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+
+//   totalAmount: roundToTwo(updatedClaims.reduce((sum, c) => sum + safeAmount(c), 0)),
+
+// pendingAmount: roundToTwo(updatedClaims
+//   .filter(c => normalizeStatus(c.status_of_approval) === 'pending')
+//   .reduce((sum, c) => sum + safeAmount(c), 0)),
+
+// approvedAmount: roundToTwo(updatedClaims
+//   .filter(c => normalizeStatus(c.status_of_approval) === 'approved')
+//   .reduce((sum, c) => sum + safeAmount(c), 0)),
+
+// rejectedAmount: roundToTwo(updatedClaims
+//   .filter(c => normalizeStatus(c.status_of_approval) === 'rejected')
+//   .reduce((sum, c) => sum + safeAmount(c), 0)),
+
+// };
+
+// // const summary = {
+// //   totalClaims: updatedClaims.length,
+// //   pendingClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'pending').length,
+// //   approvedClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'approved').length,
+// //   rejectedClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'rejected').length,
+// //   totalAmount: roundToTwo(updatedClaims.reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+// //   pendingAmount: roundToTwo(updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'pending')
+// //     .reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+// //   approvedAmount: roundToTwo(updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'approved')
+// //     .reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+// //   rejectedAmount: roundToTwo(updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'rejected')
+// //     .reduce((sum, c) => sum + Number(c.claim_amount) || 0, 0)),
+// // };
+
+// console.log('Pending amounts:', updatedClaims
+//   .filter(c => normalizeStatus(c.status_of_approval) === 'pending')
+//   .map(c => c.claim_amount));
+
+// console.log('Approved amounts:', updatedClaims
+//   .filter(c => normalizeStatus(c.status_of_approval) === 'approved')
+//   .map(c => c.claim_amount));
+
+// console.log('Rejected amounts:', updatedClaims
+//   .filter(c => normalizeStatus(c.status_of_approval) === 'rejected')
+//   .map(c => c.claim_amount));
+
+//       setDashboardData({
+//         claims: updatedClaims,
+//         policyDetails,
+//         summary
+//       });
+
+//     } catch (error) {
+//       console.error('Error fetching dashboard data:', error);
+//     } finally {
+//       setIsLoading(false);
+//       setRefreshing(false);
+//     }
+//   };
+
+//   const onRefresh = () => {
+//     setRefreshing(true);
+//     fetchDashboardData();
+//   };
+
+//   // const formatCurrency = (amount) => {
+//   //   return `₹ ${amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+//   // };
+// const formatCurrency = (amount) => {
+//   return `₹ ${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+// };
+
+//   if (isLoading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#4285F4" />
+//         <Text style={styles.loadingText}>Loading dashboard...</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       <View style={styles.header}>
+//         <Text style={styles.headerTitle}>Expense Dashboard</Text>
+//         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+//           <Icon name="account-circle" size={30} color="#333" />
+//         </TouchableOpacity>
+//       </View>
+
+//       <ScrollView
+//         contentContainerStyle={styles.scrollContent}
+//         refreshControl={
+//           <RefreshControl
+//             refreshing={refreshing}
+//             onRefresh={onRefresh}
+//             colors={['#4285F4']}
+//           />
+//         }
+//       >
+//         <View style={styles.summaryContainer}>
+//           <View style={styles.summaryRow}>
+//             <View style={[styles.summaryCard, { backgroundColor: '#E8F0FE' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.totalClaims}</Text>
+//               <Text style={styles.summaryLabel}>Total Claims</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.totalAmount)}</Text>
+//             </View>
+//             <View style={[styles.summaryCard, { backgroundColor: '#FEF7E0' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.pendingClaims}</Text>
+//               <Text style={styles.summaryLabel}>Pending</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.pendingAmount)}</Text>
+//             </View>
+//           </View>
+
+//           <View style={styles.summaryRow}>
+//             <View style={[styles.summaryCard, { backgroundColor: '#E6F4EA' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.approvedClaims}</Text>
+//               <Text style={styles.summaryLabel}>Approved</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.approvedAmount)}</Text>
+//             </View>
+//             <View style={[styles.summaryCard, { backgroundColor: '#FCE8E6' }]}>
+//               <Text style={styles.summaryValue}>{dashboardData.summary.rejectedClaims}</Text>
+//               <Text style={styles.summaryLabel}>Rejected</Text>
+//               <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.rejectedAmount)}</Text>
+//             </View>
+//           </View>
+//         </View>
+
+//         <ExpenseHeadChart 
+//           claims={dashboardData.claims} 
+//           policyDetails={dashboardData.policyDetails} 
+//         />
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, backgroundColor: '#f5f5f5' },
+//   loadingContainer: {
+//     flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5',
+//   },
+//   loadingText: { marginTop: 10, color: '#333' },
+//   header: {
+//     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+//     paddingHorizontal: 20, paddingVertical: 15, backgroundColor: '#fff',
+//     borderBottomWidth: 1, borderBottomColor: '#eee',
+//   },
+//   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+//   scrollContent: { padding: 15 },
+//   summaryContainer: { marginBottom: 20 },
+//   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+//   summaryCard: {
+//     width: '48%', borderRadius: 12, padding: 15,
+//     shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1, shadowRadius: 4, elevation: 2,
+//   },
+//   summaryValue: { fontSize: 24, fontWeight: 'bold', color: '#333', marginBottom: 4 },
+//   summaryLabel: { fontSize: 14, color: '#666', marginBottom: 6 },
+//   summaryAmount: { fontSize: 16, fontWeight: '500', color: '#333' },
+// });
+
+// export default HomeScreen;
+
+
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+  SafeAreaView
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ExpenseHeadChart from './ExpenseHeadChart';
+import { BASEPATH } from '../config';
+
+// Utility functions moved outside component
+const normalizeStatus = (status) => status?.toString().toLowerCase().trim();
+
+// const safeAmount = (amount) => {
+//   const num = Number(amount);
+//   return isNaN(num) ? 0 : num;
+// };
+const safeAmount = (amount) => {
+  if (!amount) return 0;
+  // Convert to string, remove anything except digits and dot (decimal)
+  const cleaned = amount.toString().replace(/[^0-9.]/g, '');
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
 };
 
-const HomeScreen = () => {
-  const [claims, setClaims] = useState([]);
-  const [loading, setLoading] = useState(true);
+const roundToTwo = (num) => Math.round(num * 100) / 100;
 
-  // Simulated API fetch - replace this with your real fetch
+const formatCurrency = (amount) => {
+  return `₹ ${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+};
+
+const HomeScreen = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dashboardData, setDashboardData] = useState({
+    claims: [],
+    policyDetails: [],
+    summary: {
+      totalClaims: 0,
+      pendingClaims: 0,
+      approvedClaims: 0,
+      rejectedClaims: 0,
+      totalAmount: 0,
+      pendingAmount: 0,
+      approvedAmount: 0,
+      rejectedAmount: 0
+    }
+  });
+
   useEffect(() => {
-    const fetchClaims = async () => {
-      try {
-        // Example: replace with your API call
-        const response = await fetch('https://your-api.com/claims');
-        const json = await response.json();
-        setClaims(json.claims);
-      } catch (e) {
-        console.error(e);
-        // Fallback demo data if needed
-        setClaims([
-          {
-            expense_head: 116,
-            status_of_approval: 'pending',
-            documents: [{ entered_amount: 229 }],
-          },
-          {
-            expense_head: 116,
-            status_of_approval: 'approved',
-            documents: [{ entered_amount: 300 }],
-          },
-          {
-            expense_head: 120,
-            status_of_approval: 'rejected',
-            documents: [{ entered_amount: 100 }],
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClaims();
+    fetchDashboardData();
   }, []);
 
-  if (loading) {
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      const emp_id = await AsyncStorage.getItem('username');
+      const company_id = await AsyncStorage.getItem('companyname');
+
+      if (!emp_id || !company_id) {
+        throw new Error('Missing emp_id or company_id');
+      }
+
+      const response = await axios.get(
+        `${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`
+      );
+
+      const claims = response.data.claims || [];
+      const policyDetails = response.data.approval_claim_data?.policy_details_data_sec || [];
+
+      // Attach policy details to claims
+      const updatedClaims = claims.map(claim => {
+        const match = policyDetails.find(policy =>
+          String(policy.policy_detail_id) === String(claim.policy_id) &&
+          String(policy.main_expense_head_id) === String(claim.expense_head) &&
+          String(policy.sub_expense_head_id) === String(claim.subexpense_head)
+        );
+
+        return {
+          ...claim,
+          expense_head_name: match?.expense_head_name || 'N/A',
+          sub_expense_head_name: match?.sub_expense_head_name || 'N/A',
+        };
+      });
+
+      // Generate summary
+      const summary = {
+        totalClaims: updatedClaims.length,
+        pendingClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'pending').length,
+        approvedClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'approved').length,
+        rejectedClaims: updatedClaims.filter(c => normalizeStatus(c.status_of_approval) === 'rejected').length,
+
+        totalAmount: roundToTwo(updatedClaims.reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+
+        pendingAmount: roundToTwo(updatedClaims
+          .filter(c => normalizeStatus(c.status_of_approval) === 'pending')
+          .reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+
+        approvedAmount: roundToTwo(updatedClaims
+          .filter(c => normalizeStatus(c.status_of_approval) === 'approved')
+          .reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+
+        rejectedAmount: roundToTwo(updatedClaims
+          .filter(c => normalizeStatus(c.status_of_approval) === 'rejected')
+          .reduce((sum, c) => sum + safeAmount(c.claim_amount), 0)),
+      };
+
+      setDashboardData({
+        claims: updatedClaims,
+        policyDetails,
+        summary
+      });
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchDashboardData();
+  };
+
+  if (isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading claims data...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4285F4" />
+        <Text style={styles.loadingText}>Loading dashboard...</Text>
       </View>
     );
   }
 
-  const { approved, rejected, pending } = transformData(claims);
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Claims Summary (Stacked Bar Chart)</Text>
-      <Svg height={400} width="100%">
-        <VictoryChart
-          theme={VictoryTheme.material}
-          domainPadding={20}
-          height={400}
-          width={350}
-        >
-          <VictoryAxis 
-            tickFormat={(t) => t.split(' ')[1]} // Show only expense number
-            style={{ tickLabels: { angle: -45, fontSize: 10, padding: 15 } }}
-          />
-          <VictoryAxis dependentAxis tickFormat={(x) => `₹${x}`} />
-          <VictoryStack colorScale={['green', 'red', 'orange']}>
-            <VictoryBar data={approved} />
-            <VictoryBar data={rejected} />
-            <VictoryBar data={pending} />
-          </VictoryStack>
-        </VictoryChart>
-      </Svg>
-      <View style={styles.legend}>
-        <View style={[styles.legendItem, { backgroundColor: 'green' }]} />
-        <Text>Approved</Text>
-        <View style={[styles.legendItem, { backgroundColor: 'red', marginLeft: 20 }]} />
-        <Text>Rejected</Text>
-        <View style={[styles.legendItem, { backgroundColor: 'orange', marginLeft: 20 }]} />
-        <Text>Pending</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Expense Dashboard</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+          <Icon name="account-circle" size={30} color="#333" />
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#4285F4']}
+          />
+        }
+      >
+        <View style={styles.summaryContainer}>
+          <View style={styles.summaryRow}>
+            <View style={[styles.summaryCard, { backgroundColor: '#E8F0FE' }]}>
+              <Text style={styles.summaryValue}>{dashboardData.summary.totalClaims}</Text>
+              <Text style={styles.summaryLabel}>Total Claims</Text>
+              <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.totalAmount)}</Text>
+            </View>
+            <View style={[styles.summaryCard, { backgroundColor: '#FEF7E0' }]}>
+              <Text style={styles.summaryValue}>{dashboardData.summary.pendingClaims}</Text>
+              <Text style={styles.summaryLabel}>Pending</Text>
+              <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.pendingAmount)}</Text>
+            </View>
+          </View>
+
+          <View style={styles.summaryRow}>
+            <View style={[styles.summaryCard, { backgroundColor: '#E6F4EA' }]}>
+              <Text style={styles.summaryValue}>{dashboardData.summary.approvedClaims}</Text>
+              <Text style={styles.summaryLabel}>Approved</Text>
+              <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.approvedAmount)}</Text>
+            </View>
+            <View style={[styles.summaryCard, { backgroundColor: '#FCE8E6' }]}>
+              <Text style={styles.summaryValue}>{dashboardData.summary.rejectedClaims}</Text>
+              <Text style={styles.summaryLabel}>Rejected</Text>
+              <Text style={styles.summaryAmount}>{formatCurrency(dashboardData.summary.rejectedAmount)}</Text>
+            </View>
+          </View>
+        </View>
+
+        <ExpenseHeadChart
+          claims={dashboardData.claims}
+          policyDetails={dashboardData.policyDetails}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    alignItems: 'center',
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  loadingContainer: {
+    flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5',
   },
-  centered: {
-    flex: 1, justifyContent: 'center', alignItems: 'center',
+  loadingText: { marginTop: 10, color: '#333' },
+  header: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 20, paddingVertical: 15, backgroundColor: '#fff',
+    borderBottomWidth: 1, borderBottomColor: '#eee',
   },
-  title: {
-    fontSize: 20, fontWeight: 'bold', marginBottom: 20,
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+  scrollContent: { padding: 15 },
+  summaryContainer: { marginBottom: 20 },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  summaryCard: {
+    width: '48%', borderRadius: 12, padding: 15,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, shadowRadius: 4, elevation: 2,
   },
-  legend: {
-    flexDirection: 'row',
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  legendItem: {
-    width: 20,
-    height: 20,
-  },
+  summaryValue: { fontSize: 24, fontWeight: 'bold', color: '#333', marginBottom: 4 },
+  summaryLabel: { fontSize: 14, color: '#666', marginBottom: 6 },
+  summaryAmount: { fontSize: 16, fontWeight: '500', color: '#333' },
 });
 
 export default HomeScreen;
