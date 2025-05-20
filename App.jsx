@@ -46,28 +46,7 @@ const BottomTabs = () => {
   return(
   <Tab.Navigator screenOptions={{ headerShown: false, tabBarShowLabel: true , animation:"shift", tabBarActiveTintColor: '#7E8356', 
     tabBarInactiveTintColor: 'gray',}} >
-    {/* <Tab.Screen 
-      name="Home" 
-      component={HomeScreen} 
-      options={{ 
-        tabBarIcon: ({ color, size,focused }) => <Icon name="home" color={focused ? "#7E8356" : color} size={size} /> 
-      }} 
-    /> */}
-    {/* <Tab.Screen 
-      name="Claims" 
-      component={ClaimsScreen} 
-      options={{ 
-        tabBarIcon: ({ color, size , focused}) => <Icon name="file-document" color={focused ? "#7E8356" : color} size={size} /> 
-      }} 
-    /> */}
-    {/* <Tab.Screen
-  name="NewClaimRequest"
-  component={NewClaimRequestScreen}
-  options={{
-    tabBarButton: () => null, // Hides it from the tab bar
-    headerShown: false,
-  }}
-/> */}
+    
 <Tab.Screen 
   name="Home" 
   component={HomeStackNavigator}

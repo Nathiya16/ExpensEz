@@ -4228,11 +4228,15 @@ import {
   RefreshControl,
   SafeAreaView
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+//import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ExpenseHeadChart from './ExpenseHeadChart';
 import { BASEPATH } from '../config';
+import { useTheme } from "../../theme/useTheme";
+import Icon from 'react-native-vector-icons/Ionicons';
+//import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 // Utility functions moved outside component
 const normalizeStatus = (status) => status?.toString().toLowerCase().trim();
@@ -4256,6 +4260,27 @@ const formatCurrency = (amount) => {
 };
 
 const HomeScreen = ({ navigation }) => {
+    const { theme } = useTheme();
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getUnreadCount();
+    });
+
+    getUnreadCount(); 
+
+    return unsubscribe;
+  }, [navigation]);
+
+  const getUnreadCount = async () => {
+    const count = await AsyncStorage.getItem('unreadCount');
+    setUnreadCount(parseInt(count || '0', 10));
+  };
+  const handleNotification = () => {
+    navigation.navigate('Notifications');
+   }
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [dashboardData, setDashboardData] = useState({
@@ -4363,9 +4388,28 @@ const HomeScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Expense Dashboard</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-          <Icon name="account-circle" size={30} color="#333" />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={handleNotification}>
+     <Icon name="notifications-outline" size={28} color={theme.text} />
+     {unreadCount > 0 && (
+      <View
+        style={{
+          position: 'absolute',
+          top: -4,
+          right: -4,
+          backgroundColor: 'red',
+          borderRadius: 10,
+          width: 18,
+          height: 18,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: theme.text, fontSize: 10, fontWeight: 'bold' }}>
+          {unreadCount}
+        </Text>
+      </View>
+    )}
+  </TouchableOpacity>
       </View>
 
       <ScrollView

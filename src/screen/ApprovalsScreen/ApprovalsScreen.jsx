@@ -176,7 +176,7 @@ export default function ApprovalScreen() {
         setSelectedItems([]);
         Alert.alert('Success', 'Approval status updated successfully');
       } else {
-        Alert.alert('Failed', 'Unable to approve claims.');
+        Alert.alert('Failed', 'Unable to update approvals.');
       }
   
     } catch (error) {

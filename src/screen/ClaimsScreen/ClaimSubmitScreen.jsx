@@ -143,9 +143,14 @@ import Icon from 'react-native-vector-icons/Feather';
 
 
 const ClaimSubmitScreen = ({ navigation }) => {
-  const handleBack = () => {
-    navigation.navigate('Claims', { screen: 'ClaimsList' });
-  };
+  // const handleBack = () => {
+  //   navigation.navigate('Claims', { screen: 'ClaimsList' });
+  // };
+const handleBack = () => {
+  navigation.navigate('MainTabs', {
+    screen: 'Claims',
+  });
+};
 
 // const ClaimSubmitScreen = ({ navigation }) => {
 
