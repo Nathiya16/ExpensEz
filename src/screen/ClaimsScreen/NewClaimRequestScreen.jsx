@@ -1797,173 +1797,132 @@
 // export default NewClaimRequestScreen;
 
 
+{/* {entity?.date && (
+    <View style={{ marginBottom: 10 }}>
+       <Text>Date</Text>
+      <TextInput
+        value={entity.date}
+        editable={true}
+        style={{ borderWidth: 1, padding: 8 }}
+      />
+     <Text style={styles.note}>*Change the date if it is incorrect.</Text>
+    </View>
+  )}
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image, Alert } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/Ionicons';
-import axios from 'axios';
-import { useTheme } from '../../theme/useTheme';
-import { BASEPATH } from '../config';
-import {launchImageLibrary} from 'react-native-image-picker';
-import { PermissionsAndroid, Platform, Linking } from 'react-native';
-import { ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+{entity?.total && (
+    <View style={{ marginBottom: 10 }}>
+      <Text>Total</Text>
+      <TextInput
+        value={entity.total}
+        editable={true}
+        style={{ borderWidth: 1, padding: 8 }}
+      />
+      <Text style={styles.note}>*Change the total if it is incorrect.</Text>
+    </View>
+  )} */}
+{/* {entity?.date && (
+        <View style={{ marginBottom: 10 }}>
+          <Text>Date</Text>
+          <TextInput
+            value={editedDate} 
+            onChangeText={(text) => setEditedDate(text)} 
+            editable={true}
+            style={{ borderWidth: 1, padding: 8 }}
+          />
+          <Text style={styles.note}>*Change the date if it is incorrect.</Text>
+        </View>
+      )}
 
+      {entity?.total && (
+        <View style={{ marginBottom: 10 }}>
+          <Text>Total</Text>
+          <TextInput
+            value={editedTotal} // Use the state value here
+            onChangeText={(text) => setEditedTotal(text)} // Update state on edit
+            editable={true}
+            style={{ borderWidth: 1, padding: 8 }}
+          />
+          <Text style={styles.note}>*Change the total if it is incorrect.</Text>
+        </View>
+      )} */}
+       // useEffect(() => {
+  //   const fetchPolicies = async () => {
+  //     try {
+  //       const response = await axios.get(`${BASEPATH}v1/client/policy/get_all_policies2/?operation=read&company_id=durr`);
+  //       const apiData = response?.data?.data || [];
+  
+  //       const categories = apiData.map(item => ({
+  //         id: item.main_expense_head,
+  //         name: item.main_expense_name,
+  //       }));
+  
+  //       const map = {};
+  //       apiData.forEach(item => {
+  //         map[item.main_expense_name] = item.policy_details;
+  //       });
+  
+  //       setMainCategories(categories);
+  //       setPolicyMap(map);
+  //     } catch (error) {
+  //       Alert.alert('Something went wrong');
+  //     }
+  //   };
+  
+  //   fetchPolicies();
+  // }, []);
+  
+//   useEffect(() => {
+//   const fetchPolicies = async () => {
+//     try {
+//       const response = await axios.get(`http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/`);
+//       const apiData = response?.data?.data || [];
 
-const NewClaimRequestScreen = ({ navigation }) => {
-  const { theme } = useTheme();
-  const [mainCategory, setMainCategory] = useState(null);
-  const [subCategory, setSubCategory] = useState(null);
-  const [amount, setAmount] = useState(null);
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [mainCategories, setMainCategories] = useState([]);
-  const [policyMap, setPolicyMap] = useState({});
-  const [showPolicyDetails, setShowPolicyDetails] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null); 
-  const [loading, setLoading] = useState(false); 
-  const [entity, setEntity] = useState(null);
-  const [companyId, setCompanyId] = useState('');
-const [empId, setEmpId] = useState('');
+//       const currentGrade = employeeGrade; // e.g., 'Grade A'
 
+//       const mainCategories = [];
+//       const subCategories = [];
 
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false);
-    setDate(currentDate);
-  };
+//       apiData.forEach(item => {
+//         const mainExpenseName = item.main_expense_name;
+//         const mainExpenseHead = item.main_expense_head;
 
-  const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
+//         // Collect relevant sub-expenses for this main category based on grade
+//         const matchingPolicyDetails = item.policy_details.filter(detail =>
+//           detail.employee_grades.some(grade => grade.grade_name === currentGrade)
+//         );
 
-  const [apiData, setApiData] = useState({
-    amount: '',
-    policyMap: {},
-    expense_head: '',  
-    subexpense_head: '',  
-    date: '', 
-    
-  });
-  
-const [editedDate, setEditedDate] = useState(entity?.date || '');
-const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
+//         if (matchingPolicyDetails.length > 0) {
+//           // Add main expense only if it has matching policies
+//           if (!mainCategories.find(cat => cat.id === mainExpenseHead)) {
+//             mainCategories.push({
+//               id: mainExpenseHead,
+//               name: mainExpenseName,
+//             });
+//           }
 
+//           matchingPolicyDetails.forEach(detail => {
+//             subCategories.push({
+//               id: detail.sub_expense_head,
+//               name: `${detail.sub_expense_name} (${detail.limit_name})`,
+//               mainId: mainExpenseHead, // For filtering based on selected main category
+//             });
+//           });
+//         }
+//       });
 
-  const handleCancel = () => {
-    navigation.navigate('Claims');
-  };
-  
-  
-  
-  useEffect(() => {
-    const fetchPolicies = async () => {
-      try {
-        const response = await axios.get(`${BASEPATH}v1/client/policy/get_all_policies2/?operation=read&company_id=durr`);
-        const apiData = response?.data?.data || [];
-  
-        const categories = apiData.map(item => ({
-          id: item.main_expense_head,
-          name: item.main_expense_name,
-        }));
-  
-        const map = {};
-        apiData.forEach(item => {
-          map[item.main_expense_name] = item.policy_details;
-        });
-  
-        setMainCategories(categories);
-        setPolicyMap(map);
-      } catch (error) {
-        Alert.alert('Something went wrong');
-      }
-    };
-  
-    fetchPolicies();
-  }, []);
-  
-  useEffect(() => {
-  if (entity) {
-    setEditedDate(entity?.date || '');
-    setEditedTotal(entity?.total?.toString() || '');
-  }
-}, [entity]);
+//       // Update your state
+//       setMainCategories(mainCategories);   // for Main Expense dropdown
+//       setSubCategories(subCategories);     // for Sub Expense dropdown (filtered as needed)
 
-  
-  
-  const handleChooseImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        includeBase64: true,
-        quality: 0.8,
-      },
-      (response) => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-        } else if (response.errorCode) {
-          console.log('Image Picker Error:', response.errorMessage);
-          Alert.alert('Error', 'Failed to pick image');
-        } else {
-          const base64Image = response.assets?.[0]?.base64;
-          if (base64Image) {
-            setSelectedImage({
-              uri: response.assets[0].uri,
-              base64: base64Image,
-            });
-          }
-        }
-      }
-    );
-  };
-   // const requestGalleryPermission = async () => {
-//   if (Platform.OS === 'android') {
-//     const permission = Platform.Version >= 33
-//       ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-//       : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+//     } catch (error) {
+//       Alert.alert('Something went wrong');
+//     }
+//   };
 
-//     const alreadyGranted = await PermissionsAndroid.check(permission);
-//     if (alreadyGranted) return true;
+//   fetchPolicies();
+// }, [employeeGrade]);
 
-//     const granted = await PermissionsAndroid.request(permission, {
-//       title: 'Photo Access Needed',
-//       message: 'We need access to your gallery to upload the bill.',
-//       buttonPositive: 'OK',
-//     });
-
-//     return granted === PermissionsAndroid.RESULTS.GRANTED;
-//   }
-//   return true; 
-// };
-  //  const handleUploadBill = async () => {
-  //   if (!selectedImage) {
-  //     Alert.alert('No Image Selected', 'Please choose an image before uploading.');
-  //     return;
-  //   }
-  
-  //   setLoading(true); 
-  //   try {
-  //     //const permissionGranted = await requestGalleryPermission();
-  
-  //     // if (!permissionGranted) {
-  //     //   Alert.alert(
-  //     //     'Permission Denied',
-  //     //     'Please enable photo access in settings to upload the bill.',
-  //     //     [
-  //     //       { text: 'Cancel', style: 'cancel' },
-  //     //       { text: 'Open Settings', onPress: () => Linking.openSettings() },
-  //     //     ]
-  //     //   );
-  //     //   setLoading(false);
-  //     //   return;
-  //     // }
-      
-  // const formData = new FormData();
+// const formData = new FormData();
   // formData.append("file", selectedImage, selectedImage.name);
 
   // const payload = {
@@ -2280,121 +2239,6 @@ const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
 //     setLoading(false);
 //   }
 // };
-const handleUploadBill = async () => {
-  if (!selectedImage) {
-    Alert.alert('No Image Selected', 'Please choose an image before uploading.');
-    return;
-  }
-
-  if (!selectedImage.base64 || !selectedImage.uri) {
-    Alert.alert('Image Error', 'Image is missing base64 or URI data.');
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const formData = new FormData();
-
-    // Append the image file
-    formData.append('file', {
-      uri: selectedImage.uri,
-      type: selectedImage.type || 'image/jpeg',
-      name: selectedImage.fileName || 'upload.jpg',
-    });
-
-    // Append the payload with the base64 string as 'document'
-    const payload = {
-      company_id: 'CompanyID',
-      expense_head: 'MainExpense',
-      subexpense_head: 'SubExpense',
-      document: [`data:image/jpeg;base64,${selectedImage.base64}`],
-    };
-
-    formData.append('data', JSON.stringify(payload));
-
-    // Upload the image and data
-    const response = await axios.post(
-      `${BASEPATH}v1/client/ocr_model_check/ocr_checks_creator_four/`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Ensure this header is set for form-data
-        },
-      }
-    );
-
-    const data = response.data;
-
-    // Update UI with returned data
-    setEntity(data.entities?.[0]);
-    setApiData({
-      expense_head: data.expense_head,
-      subexpense_head: data.subexpense_head,
-    });
-
-    Alert.alert('Success', 'Image uploaded and data populated!');
-  } catch (err) {
-    console.error('Upload error:', err.response?.data || err.message);
-
-    let errorMessage = 'Something went wrong. Please try again later.';
-    const detail = err.response?.data?.detail;
-
-    if (Array.isArray(detail)) {
-      errorMessage = detail.map((e) => e.msg || JSON.stringify(e)).join('\n');
-    } else if (typeof detail === 'string') {
-      errorMessage = detail;
-    }
-
-    Alert.alert('Upload failed', errorMessage);
-  } finally {
-    setLoading(false);
-  }
-};
-
-useEffect(() => {
-  const loadData = async () => {
-    try {
-      const storedCompanyId = await AsyncStorage.getItem('companyname');
-      const storedEmpId = await AsyncStorage.getItem('username');
-
-      if (storedCompanyId) setCompanyId(storedCompanyId);
-      if (storedEmpId) setEmpId(storedEmpId);
-    } catch (error) {
-      console.error("Failed to load user data", error);
-    }
-  };
-
-  loadData();
-}, []);
-const handleSubmit = async()=> {
-
-  const mainCategoryData = mainCategories.find(item => item.name === mainCategory);
-
-const selectedPolicy = policyMap[mainCategory]?.find(
-  policy => policy.sub_expense_name === subCategory
-);
-
-
-if (!selectedPolicy) {
-  return Alert.alert("Error", "Could not find matching policy details.");
-}
-
-
-const policyId = selectedPolicy.policy_detail_id; 
-const mainExpenseHeadId = mainCategoryData?.id;
-const subExpenseHeadId = selectedPolicy.sub_expense_head;  
-
-const ocrDate = entity?.ocr_date; 
-const ocrAmount = entity?.ocr_amount; 
-  
-  
-// const finalDate = date ? formatDate(date) : ocrDate; 
-// const finalAmount = amount || ocrAmount; 
-
-const finalDate = editedDate || ocrDate;
-const finalAmount = editedTotal || ocrAmount;
-
 // const payload = {
 //   employee_claim_data: [
 //     {
@@ -2472,6 +2316,658 @@ const finalAmount = editedTotal || ocrAmount;
 //       }
 //     ]
 //   };
+
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image, Alert } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+import Icon from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
+import { useTheme } from '../../theme/useTheme';
+import { BASEPATH } from '../config';
+import {launchImageLibrary} from 'react-native-image-picker';
+import { PermissionsAndroid, Platform, Linking } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+const NewClaimRequestScreen = ({ navigation }) => {
+  const { theme } = useTheme();
+  const [mainCategory, setMainCategory] = useState(null);
+  const [subCategory, setSubCategory] = useState(null);
+  const [amount, setAmount] = useState(null);
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  //const [mainCategories, setMainCategories] = useState([]);
+  //const [subCategories, setSubCategories] = useState([]);
+  const [policyMap, setPolicyMap] = useState({});
+  const [showPolicyDetails, setShowPolicyDetails] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null); 
+  const [loading, setLoading] = useState(false); 
+  const [entity, setEntity] = useState(null);
+  const [companyId, setCompanyId] = useState('');
+const [empId, setEmpId] = useState('');
+const [mainCategories, setMainCategories] = useState([]);
+  const [subCategoriesMap, setSubCategoriesMap] = useState({});
+  const [selectedMainCategory, setSelectedMainCategory] = useState(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(false);
+    setDate(currentDate);
+  };
+
+  const formatDate = (date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const [apiData, setApiData] = useState({
+    amount: '',
+    policyMap: {},
+    expense_head: '',  
+    subexpense_head: '',  
+    date: '', 
+    
+  });
+  
+const [editedDate, setEditedDate] = useState(entity?.date || '');
+const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
+
+
+  const handleCancel = () => {
+    navigation.navigate('Claims');
+  };
+  
+  
+  
+  
+//const [employeeGrade, setEmployeeGrade] = useState(null);
+
+// const fetchPolicies = async () => {
+//   try {
+//     const response = await axios.post(`http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/`, {
+//       operation: "read",
+//       company_id: "durr", 
+//     });
+// console.log("API Response:", response.data);
+//     const apiData = response?.data?.data || [];
+
+//     const mainCategories = [];
+//     const subCategories = [];
+
+//     apiData.forEach(item => {
+//       const mainExpenseName = item.main_expense_name;
+//       const mainExpenseHead = item.main_expense_head;
+
+//       const matchingPolicyDetails = item.policy_details.filter(detail =>
+//         detail.employee_grades.some(grade => grade.grade_name === employeeGrade)
+//       );
+
+//       if (matchingPolicyDetails.length > 0) {
+//         if (!mainCategories.find(cat => cat.id === mainExpenseHead)) {
+//           mainCategories.push({
+//             id: mainExpenseHead,
+//             name: mainExpenseName,
+//           });
+//         }
+
+//         matchingPolicyDetails.forEach(detail => {
+//           subCategories.push({
+//             id: detail.sub_expense_head,
+//             name: `${detail.sub_expense_name} (${detail.limit_name})`,
+//             mainId: mainExpenseHead,
+//           });
+//         });
+//       }
+//     });
+
+//     setMainCategories(mainCategories);
+//     setSubCategories(subCategories);
+//   } catch (error) {
+//     console.error("Error fetching data:", error?.response?.data || error.message);
+//     Alert.alert("Something went wrong while loading policies.");
+//   }
+// };
+// useEffect(() => {
+//   const checkStorage = async () => {
+//     const company_id = await AsyncStorage.getItem('companyname');
+//     console.log("Company ID from AsyncStorage:", company_id);
+//   };
+
+//   checkStorage();
+// }, []);
+
+// useEffect(() => {
+//   const fetchIfReady = async () => {
+//     const company_id = await AsyncStorage.getItem('companyname');
+//     console.log("Inside fetchIfReady:", { employeeGrade, company_id });
+
+//     if (employeeGrade && company_id) {
+//       fetchPolicies(); // 👈 will trigger if both are present
+//     } else {
+//       console.log("Still waiting for both values...");
+//     }
+//   };
+
+//   fetchIfReady();
+// }, [employeeGrade]);
+
+
+// useEffect(() => {
+//   const initialize = async () => {
+//     const grade = await AsyncStorage.getItem('grade');
+//     const company_id = await AsyncStorage.getItem('companyname');
+
+//     console.log("Init grade:", grade);
+//     console.log("Init company_id:", company_id);
+
+//     if (grade) setEmployeeGrade(grade);
+//     if (company_id) setCompanyId(company_id); // Optional if not already state
+
+//     if (grade && company_id) {
+//       fetchPolicies();
+//     }
+//   };
+
+//   initialize();
+// }, []);
+
+
+// const fetchPolicies = async () => {
+//   console.log("Inside fetchPolicies...");
+
+//   try {
+//     const emp_id = await AsyncStorage.getItem('username');
+//     const company_id = await AsyncStorage.getItem('companyname');
+
+//     if (!emp_id || !company_id) {
+//       throw new Error('Missing emp_id or company_id in AsyncStorage');
+//     }
+
+//     console.log("Calling fetchPolicies with:", { company_id });
+
+//     const response = await axios.post(
+//       `http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/`,
+//       {
+//         operation: "read",
+//         company_id, // ✅ use the one from AsyncStorage
+//       }
+//     );
+
+//     console.log("API response:", response.data);
+
+//     const apiData = response?.data?.data || [];
+
+//     const mainCategories = [];
+//     const subCategories = [];
+
+//     apiData.forEach(item => {
+//       const mainExpenseName = item.main_expense_name;
+//       const mainExpenseHead = item.main_expense_head;
+
+//       const matchingPolicyDetails = item.policy_details.filter(detail =>
+//         detail.employee_grades.some(grade => grade.grade_name === employeeGrade)
+//       );
+
+//       if (matchingPolicyDetails.length > 0) {
+//         if (!mainCategories.find(cat => cat.id === mainExpenseHead)) {
+//           mainCategories.push({
+//             id: mainExpenseHead,
+//             name: mainExpenseName,
+//           });
+//         }
+
+//         matchingPolicyDetails.forEach(detail => {
+//           subCategories.push({
+//             id: detail.sub_expense_head,
+//             name: `${detail.sub_expense_name} (${detail.limit_name})`,
+//             mainId: mainExpenseHead,
+//           });
+//         });
+//       }
+//     });
+
+//     setMainCategories(mainCategories);
+//     setSubCategories(subCategories);
+
+//     const policyMapTemp = {};
+//     mainCategories.forEach(cat => {
+//       policyMapTemp[cat.name] = subCategories.filter(sub => sub.mainId === cat.id);
+//     });
+//     setPolicyMap(policyMapTemp);
+
+//   } catch (error) {
+//     console.error("Error fetching data:", error?.response?.data || error.message);
+//     Alert.alert("Something went wrong while loading policies.");
+//   }
+// };
+// useEffect(() => {
+//   console.log("Current employeeGrade:", employeeGrade);
+// }, [employeeGrade]);
+
+// useEffect(() => {
+//   if (employeeGrade) {
+//     fetchPolicies();
+//   }
+// }, [employeeGrade]);
+// const fetchPolicies = async () => {
+//   console.log("Inside fetchPolicies...");
+
+//   try {
+//     const emp_id = await AsyncStorage.getItem('username');
+//     const company_id = await AsyncStorage.getItem('companyname');
+//     console.log("Company ID from AsyncStorage:", company_id);
+
+//     if (!emp_id || !company_id) {
+//       throw new Error('Missing emp_id or company_id in AsyncStorage');
+//     }
+
+//     const response = await axios.post(
+//       `http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/`,
+//       {
+//         operation: "read",
+//         company_id: company_id,
+//       }
+//     );
+//      console.log("Full API response:", response);
+//     console.log("Response.data:", response.data);
+//     console.log("Response.data.data:", response.data?.data);
+
+//     const apiData = response.data?.data || [];
+
+//     // console.log("API response:", response.data);
+//     // const apiData = response?.data?.data || [];
+
+//     const mainCategories = [];
+//     const subCategories = [];
+
+//     apiData.forEach(item => {
+//       const mainExpenseName = item.main_expense_name;
+//       const mainExpenseHead = item.main_expense_head;
+//       const policyDetails = item.policy_details || [];
+
+//       // Add main category if not already in the list
+//       if (!mainCategories.find(cat => cat.id === mainExpenseHead)) {
+//         mainCategories.push({
+//           id: mainExpenseHead,
+//           name: mainExpenseName,
+//         });
+//       }
+
+//       // Add all subcategories
+//       policyDetails.forEach(detail => {
+//         subCategories.push({
+//           id: detail.sub_expense_head,
+//           name: `${detail.sub_expense_name} (${detail.limit_name})`,
+//           mainId: mainExpenseHead,
+//         });
+//       });
+//     });
+
+//     // Update state
+//     setMainCategories(mainCategories);
+//     setSubCategories(subCategories);
+
+//     // Create mapping for dependent dropdown
+//     const policyMapTemp = {};
+//     mainCategories.forEach(cat => {
+//       policyMapTemp[cat.name] = subCategories.filter(sub => sub.mainId === cat.id);
+//     });
+
+//     setPolicyMap(policyMapTemp);
+
+//   } catch (error) {
+//     console.error("Error fetching data:", error?.response?.data || error.message);
+//     Alert.alert("Something went wrong while loading policies.");
+//   }
+// };
+// const fetchPolicies = async () => {
+//   try {
+//     const response = await axios.post(
+//       'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
+//       {
+//         company_id: "durr",  // replace with your actual company_id
+//         operation: "read",
+//         grade_id: 53,        // replace with actual grade_id if needed
+//       }
+//     );
+
+//     const apiData = response?.data?.data || [];
+
+//     // Prepare main categories (for dropdown 1)
+//     const mainCategories = apiData.map(item => ({
+//       id: item.main_expense_head,
+//       name: item.main_expense_name,
+//     }));
+
+//     // Prepare sub categories map (for dropdown 2)
+//     // key: main_expense_head id, value: array of sub expense options
+//     const subCategoriesMap = {};
+//     apiData.forEach(item => {
+//       subCategoriesMap[item.main_expense_head] = item.policy_details.map(detail => ({
+//         id: detail.sub_expense_head,
+//         name: `${detail.sub_expense_name} (${detail.limit_name})`,
+//       }));
+//     });
+
+//     setMainCategories(mainCategories);
+//     setSubCategoriesMap(subCategoriesMap);
+
+//   } catch (error) {
+//     console.error("Error fetching policies:", error);
+//     Alert.alert("Failed to load policies");
+//   }
+// };
+
+// useEffect(() => {
+//   console.log("Calling fetchPolicies...");
+//   fetchPolicies();
+// }, []);
+// useEffect(() => {
+//     fetchPolicies();
+//   }, []);
+
+//   const fetchPolicies = async () => {
+//     try {
+//       const response = await axios.post(
+//         'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
+//         {
+//           company_id: "durr",
+//           operation: "read",
+//           grade_id: 53,
+//         }
+//       );
+
+//       const apiData = response?.data?.data || [];
+
+//       // Extract main categories
+//       const mains = apiData.map(item => ({
+//         id: item.main_expense_head,
+//         name: item.main_expense_name,
+//       }));
+
+//       // Map subcategories by main category ID
+//       const subsMap = {};
+//       apiData.forEach(item => {
+//         subsMap[item.main_expense_head] = item.policy_details.map(detail => ({
+//           id: detail.sub_expense_head,
+//           name: `${detail.sub_expense_name} (${detail.limit_name})`,
+//         }));
+//       });
+
+//       setMainCategories(mains);
+//       setSubCategoriesMap(subsMap);
+
+//       // Set default selection to first main category if exists
+//       if (mains.length > 0) {
+//         setSelectedMainCategory(mains[0].id);
+//         const firstSubList = subsMap[mains[0].id];
+//         if (firstSubList && firstSubList.length > 0) {
+//           setSelectedSubCategory(firstSubList[0].id);
+//         }
+//       }
+
+//     } catch (error) {
+//       console.error("Error fetching policies:", error);
+//       Alert.alert("Failed to load policies");
+//     }
+//   };
+  useEffect(() => {
+    fetchPolicies();
+  }, []);
+
+  useEffect(() => {
+    if (selectedMainCategory && subCategoriesMap[selectedMainCategory]) {
+      const subList = subCategoriesMap[selectedMainCategory];
+      if (subList.length > 0) {
+        setSelectedSubCategory(subList[0].id);
+      } else {
+        setSelectedSubCategory(null);
+      }
+    }
+  }, [selectedMainCategory, subCategoriesMap]);
+
+  const fetchPolicies = async () => {
+    try {
+      const response = await axios.post(
+        'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
+        {
+          company_id: 'durr',
+          operation: 'read',
+          grade_id: 53,
+        }
+      );
+
+      const apiData = response?.data?.data ?? [];
+
+      const mains = apiData.map(item => ({
+        id: item.main_expense_head,
+        name: item.main_expense_name,
+      }));
+
+      const subsMap = {};
+      apiData.forEach(item => {
+        const subList = item.policy_details.map(detail => ({
+          id: detail.sub_expense_head,
+          name: `${detail.sub_expense_name} (${detail.limit_name})`,
+        }));
+        subsMap[item.main_expense_head] = subList;
+      });
+
+      console.log('✅ Main Categories:', mains);
+      console.log('✅ Sub Categories Map:', subsMap);
+
+      setMainCategories(mains);
+      setSubCategoriesMap(subsMap);
+
+      if (mains.length > 0) {
+        setSelectedMainCategory(mains[0].id);
+      }
+
+    } catch (error) {
+      console.error('❌ Error fetching policies:', error);
+      Alert.alert('Error', 'Failed to load policy data');
+    }
+  };
+  useEffect(() => {
+  if (entity) {
+    setEditedDate(entity?.date || '');
+    setEditedTotal(entity?.total?.toString() || '');
+  }
+}, [entity]);
+
+  
+  
+  const handleChooseImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: true,
+        quality: 0.8,
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.errorCode) {
+          console.log('Image Picker Error:', response.errorMessage);
+          Alert.alert('Error', 'Failed to pick image');
+        } else {
+          const base64Image = response.assets?.[0]?.base64;
+          if (base64Image) {
+            setSelectedImage({
+              uri: response.assets[0].uri,
+              base64: base64Image,
+            });
+          }
+        }
+      }
+    );
+  };
+   // const requestGalleryPermission = async () => {
+//   if (Platform.OS === 'android') {
+//     const permission = Platform.Version >= 33
+//       ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+//       : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+
+//     const alreadyGranted = await PermissionsAndroid.check(permission);
+//     if (alreadyGranted) return true;
+
+//     const granted = await PermissionsAndroid.request(permission, {
+//       title: 'Photo Access Needed',
+//       message: 'We need access to your gallery to upload the bill.',
+//       buttonPositive: 'OK',
+//     });
+
+//     return granted === PermissionsAndroid.RESULTS.GRANTED;
+//   }
+//   return true; 
+// };
+  //  const handleUploadBill = async () => {
+  //   if (!selectedImage) {
+  //     Alert.alert('No Image Selected', 'Please choose an image before uploading.');
+  //     return;
+  //   }
+  
+  //   setLoading(true); 
+  //   try {
+  //     //const permissionGranted = await requestGalleryPermission();
+  
+  //     // if (!permissionGranted) {
+  //     //   Alert.alert(
+  //     //     'Permission Denied',
+  //     //     'Please enable photo access in settings to upload the bill.',
+  //     //     [
+  //     //       { text: 'Cancel', style: 'cancel' },
+  //     //       { text: 'Open Settings', onPress: () => Linking.openSettings() },
+  //     //     ]
+  //     //   );
+  //     //   setLoading(false);
+  //     //   return;
+  //     // }
+      
+  
+const handleUploadBill = async () => {
+  if (!selectedImage) {
+    Alert.alert('No Image Selected', 'Please choose an image before uploading.');
+    return;
+  }
+
+  if (!selectedImage.base64 || !selectedImage.uri) {
+    Alert.alert('Image Error', 'Image is missing base64 or URI data.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const formData = new FormData();
+
+    // Append the image file
+    formData.append('file', {
+      uri: selectedImage.uri,
+      type: selectedImage.type || 'image/jpeg',
+      name: selectedImage.fileName || 'upload.jpg',
+    });
+
+    // Append the payload with the base64 string as 'document'
+    const payload = {
+      company_id: 'CompanyID',
+      expense_head: 'MainExpense',
+      subexpense_head: 'SubExpense',
+      document: [`data:image/jpeg;base64,${selectedImage.base64}`],
+    };
+
+    formData.append('data', JSON.stringify(payload));
+
+    // Upload the image and data
+    const response = await axios.post(
+      `${BASEPATH}v1/client/ocr_model_check/ocr_checks_creator_four/`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Ensure this header is set for form-data
+        },
+      }
+    );
+console.log("API response:", response.data);
+
+    const data = response.data;
+
+    // Update UI with returned data
+    setEntity(data.entities?.[0]);
+    setApiData({
+      expense_head: data.expense_head,
+      subexpense_head: data.subexpense_head,
+    });
+
+    Alert.alert('Success', 'Image uploaded and data populated!');
+  } catch (err) {
+    console.error('Upload error:', err.response?.data || err.message);
+
+    let errorMessage = 'Something went wrong. Please try again later.';
+    const detail = err.response?.data?.detail;
+
+    if (Array.isArray(detail)) {
+      errorMessage = detail.map((e) => e.msg || JSON.stringify(e)).join('\n');
+    } else if (typeof detail === 'string') {
+      errorMessage = detail;
+    }
+
+    Alert.alert('Upload failed', errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  const loadData = async () => {
+    try {
+      const storedCompanyId = await AsyncStorage.getItem('companyname');
+      const storedEmpId = await AsyncStorage.getItem('username');
+
+      if (storedCompanyId) setCompanyId(storedCompanyId);
+      if (storedEmpId) setEmpId(storedEmpId);
+    } catch (error) {
+      console.error("Failed to load user data", error);
+    }
+  };
+
+  loadData();
+}, []);
+const handleSubmit = async()=> {
+
+  const mainCategoryData = mainCategories.find(item => item.name === mainCategory);
+
+const selectedPolicy = policyMap[mainCategory]?.find(
+  policy => policy.sub_expense_name === subCategory
+);
+
+
+if (!selectedPolicy) {
+  return Alert.alert("Error", "Could not find matching policy details.");
+}
+
+
+const policyId = selectedPolicy.policy_detail_id; 
+const mainExpenseHeadId = mainCategoryData?.id;
+const subExpenseHeadId = selectedPolicy.sub_expense_head;  
+
+const ocrDate = entity?.ocr_date; 
+const ocrAmount = entity?.ocr_amount; 
+  
+  
+// const finalDate = date ? formatDate(date) : ocrDate; 
+// const finalAmount = amount || ocrAmount; 
+
+const finalDate = editedDate || ocrDate;
+const finalAmount = editedTotal || ocrAmount;
+
 
 const cleanedFinalAmount = Number(finalAmount);
 const cleanedFinalDate = finalDate?.trim();  // assuming it's a string like '2023-04-27'
@@ -2559,7 +3055,7 @@ const payload = {
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: theme.text }]}>Main Expense Category</Text>
             <View style={[styles.pickerContainer, { backgroundColor: theme.background, borderColor: theme.borderColor }]}>
-              <Picker
+              {/* <Picker
                 selectedValue={mainCategory}
                 style={[styles.picker, { color: theme.text }]}
                 dropdownIconColor={theme.text}
@@ -2571,7 +3067,15 @@ const payload = {
                 {mainCategories.map(item => (
                   <Picker.Item key={item.id} label={item.name} value={item.name} />
                 ))}
-              </Picker>
+              </Picker> */}
+              <Picker
+        selectedValue={selectedMainCategory}
+        onValueChange={(itemValue) => setSelectedMainCategory(itemValue)}
+      >
+        {mainCategories.map((main) => (
+          <Picker.Item key={main.id} label={main.name} value={main.id} />
+        ))}
+      </Picker>
             </View>
           </View>
 
@@ -2579,8 +3083,23 @@ const payload = {
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: theme.text }]}>Sub Expense Category</Text>
               <View style={[styles.pickerContainer, { backgroundColor: theme.background, borderColor: theme.borderColor }]}>
-                
-                <Picker
+                {selectedMainCategory && subCategoriesMap[selectedMainCategory] && (
+  <>
+    <Text style={{ fontWeight: 'bold', marginTop: 20 }}>Sub Expense</Text>
+
+    <Picker
+      selectedValue={selectedSubCategory}
+      onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
+      enabled={subCategoriesMap[selectedMainCategory]?.length > 0}
+    >
+      {subCategoriesMap[selectedMainCategory].map((sub) => (
+        <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
+      ))}
+    </Picker>
+  </>
+)}
+
+                {/* <Picker
   selectedValue={subCategory}
   style={[styles.picker, { color: theme.text }]}
   dropdownIconColor={theme.text}
@@ -2594,6 +3113,34 @@ const payload = {
       value={item.sub_expense_name}
     />
   ))}
+</Picker> */}
+{/* {selectedMainCategory && subCategoriesMap[selectedMainCategory]?.length > 0 ? (
+        <Picker
+          selectedValue={selectedSubCategory}
+          onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
+        >
+          {subCategoriesMap[selectedMainCategory].map((sub) => (
+            <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
+          ))}
+        </Picker>
+        ) : (
+        <Text style={{ marginTop: 10, color: 'gray' }}>No sub expenses available</Text>
+      )} */}
+
+<Text style={{ fontWeight: 'bold', marginTop: 20 }}>Sub Expense</Text>
+
+<Picker
+  selectedValue={selectedSubCategory}
+  onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
+  enabled={subCategoriesMap[selectedMainCategory]?.length > 0}
+>
+  {(subCategoriesMap[selectedMainCategory] || []).length > 0 ? (
+    subCategoriesMap[selectedMainCategory].map((sub) => (
+      <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
+    ))
+  ) : (
+    <Picker.Item label="No sub expenses available" value="" />
+  )}
 </Picker>
 
               </View>
@@ -2681,54 +3228,7 @@ const payload = {
 </View>
 
 <View>
-  {/* {entity?.date && (
-    <View style={{ marginBottom: 10 }}>
-       <Text>Date</Text>
-      <TextInput
-        value={entity.date}
-        editable={true}
-        style={{ borderWidth: 1, padding: 8 }}
-      />
-     <Text style={styles.note}>*Change the date if it is incorrect.</Text>
-    </View>
-  )}
-
-{entity?.total && (
-    <View style={{ marginBottom: 10 }}>
-      <Text>Total</Text>
-      <TextInput
-        value={entity.total}
-        editable={true}
-        style={{ borderWidth: 1, padding: 8 }}
-      />
-      <Text style={styles.note}>*Change the total if it is incorrect.</Text>
-    </View>
-  )} */}
-{/* {entity?.date && (
-        <View style={{ marginBottom: 10 }}>
-          <Text>Date</Text>
-          <TextInput
-            value={editedDate} 
-            onChangeText={(text) => setEditedDate(text)} 
-            editable={true}
-            style={{ borderWidth: 1, padding: 8 }}
-          />
-          <Text style={styles.note}>*Change the date if it is incorrect.</Text>
-        </View>
-      )}
-
-      {entity?.total && (
-        <View style={{ marginBottom: 10 }}>
-          <Text>Total</Text>
-          <TextInput
-            value={editedTotal} // Use the state value here
-            onChangeText={(text) => setEditedTotal(text)} // Update state on edit
-            editable={true}
-            style={{ borderWidth: 1, padding: 8 }}
-          />
-          <Text style={styles.note}>*Change the total if it is incorrect.</Text>
-        </View>
-      )} */}
+  
   {entity?.date && (
   <View style={{ marginBottom: 10 }}>
     <Text>Date</Text>

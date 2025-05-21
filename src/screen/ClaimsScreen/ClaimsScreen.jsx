@@ -678,7 +678,13 @@ const toggleSelect = (claimId) => {
           <Text style={[styles.subtitleText, { color: theme.text }]}>{sub}</Text>
           <View style={styles.bottomRow}>
             <Text style={[styles.dateText, { color: theme.text }]}>{item.submitted_date}</Text>
-            <Text style={[styles.amountText, { color: theme.text }]}>INR. {item.documents?.[0]?.entered_amount?.toFixed(2) ?? '0.00'}</Text>
+            {/* <Text style={[styles.amountText, { color: theme.text }]}>INR. {item.documents?.[0]?.entered_amount?.toFixed(2) ?? '0.00'}</Text> */}
+            <Text style={[styles.amountText, { color: theme.text }]}>
+  INR. {(typeof item.documents?.[0]?.entered_amount === 'number'
+    ? item.documents[0].entered_amount.toFixed(2)
+    : '0.00')}
+</Text>
+
           </View>
         </View>
       </View>
@@ -911,11 +917,14 @@ const handleDelete = async () => {
       <TouchableOpacity style={styles.addClaimButton} onPress={handleNewClaim}>
         <Text style={styles.addClaimText}>Add New Claim</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.updateButton}>
+      {/* <TouchableOpacity style={styles.updateButton}>
      <Text style={styles.updateText}>Update</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
      <Text style={styles.deleteText}>Delete</Text>
+  </TouchableOpacity> */}
+  <TouchableOpacity style={styles.advanceButton}>
+    <Text style={styles.advanceText}>Request Advance</Text>
   </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -1007,10 +1016,26 @@ const styles = StyleSheet.create({
     width:"40%",
     borderRadius: 10,
     alignItems: 'center',
+    marginLeft:20,
   },
   addClaimText: { 
     color: '#FFFFFF', 
     fontWeight: 'bold' 
+  },
+  advanceButton:{
+    //backgroundColor: '#7E8356',
+    padding: 15,
+    margin: 10,
+    width:"40%",
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth:1,
+    borderColor:'#7E8356',
+    marginRight:20,
+  },
+  advanceText:{
+    color:'#7E8356',
+    fontWeight:'bold',
   },
   updateButton:{
     borderRadius:10,
