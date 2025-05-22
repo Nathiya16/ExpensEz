@@ -20,7 +20,7 @@ import ProfileScreen from './src/screen/ProfileScreen/ProfileScreen';
 import ClaimSubmitScreen from './src/screen/ClaimsScreen/ClaimSubmitScreen';
 import NotificationScreen from './src/screen/NotificationScreen/NotificationScreen';
 import ExpenseHeadChart from './src/screen/HomeScreen/ExpenseHeadChart';
-
+import AdvanceScreen from './src/screen/ClaimsScreen/AdvanceScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const ClaimsStack = createNativeStackNavigator();
@@ -98,7 +98,7 @@ const App = () => {
         <Stack.Screen name="SubmitClaim" component={ClaimSubmitScreen} options={{headerShown:false}}/>
         <Stack.Screen name="Approvals" component={ApprovalsScreen} options={{headerShown:false}}/>
         {/* <Stack.Screen name="Notification" component={NotificationScreen} options={{headerShown:false}}/> */}
-        
+        <Stack.Screen name="Advance" component={AdvanceScreen} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
     </ThemeProvider>

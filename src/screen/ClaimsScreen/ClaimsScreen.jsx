@@ -375,7 +375,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, FlatList, TouchableWithoutFeedback, Keyboard, Button } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'axios';
 import { useTheme } from '../../theme/useTheme';
@@ -642,15 +642,22 @@ const isSelected = selectedClaims.includes(item.claim_id);
   //   }
   //   setSelectedClaims(updated);
   // };
+// const toggleSelect = (claimId) => {
+//   if (selectedClaims.includes(claimId)) {
+//     // Remove claimId from selectedClaims
+//     setSelectedClaims(selectedClaims.filter(id => id !== claimId));
+//   } else {
+//     // Add claimId to selectedClaims
+//     setSelectedClaims([...selectedClaims, claimId]);
+//   }
+// };
 const toggleSelect = (claimId) => {
-  if (selectedClaims.includes(claimId)) {
-    // Remove claimId from selectedClaims
-    setSelectedClaims(selectedClaims.filter(id => id !== claimId));
-  } else {
-    // Add claimId to selectedClaims
-    setSelectedClaims([...selectedClaims, claimId]);
-  }
-};
+    if (selectedClaims.includes(claimId)) {
+      setSelectedClaims(selectedClaims.filter((id) => id !== claimId));
+    } else {
+      setSelectedClaims([...selectedClaims, claimId]);
+    }
+  };
 
   return (
     <TouchableOpacity style={[styles.claimItem, { backgroundColor: theme.cardBg }]} activeOpacity={1}>
@@ -693,7 +700,7 @@ const toggleSelect = (claimId) => {
 };
 
   const handleNewClaim = () => navigation.navigate('NewClaimRequest');
-
+const handleAdvance = () => navigation.navigate('Advance');
 //   const handleDelete = async () => {
 //   if (selectedClaims.size === 0) {
 //     Alert.alert("No selection", "Please select at least one claim to delete.");
@@ -789,41 +796,106 @@ const toggleSelect = (claimId) => {
 //     ]
 //   );
 // };
+// const handleDelete = async () => {
+//   if (!selectedClaims || selectedClaims.length === 0) {
+//     console.warn("No claims selected for deletion.");
+//     return;
+//   }
+
+//   console.log("Delete button pressed", selectedClaims);
+
+  
+//   const deletePayload = selectedClaims.map((claimId) => ({
+//     company_id: company_id, 
+//     claim_id: claimId,
+//     is_deleted: "True"
+//   }));
+
+//   try {
+//     const response = await axios.delete(
+//       `${BASEPATH}v1/client/ocr_inserts/claims_delete/`,
+//       {
+//         data: {
+//           delete_claims: deletePayload
+//         }
+//       }
+//     );
+
+//     console.log("Delete successful", response.data);
+//     setSelectedClaims([]);
+//   } catch (error) {
+//     console.error("Error deleting claims:", error);
+//   }
+// };
 const handleDelete = async () => {
   if (!selectedClaims || selectedClaims.length === 0) {
     console.warn("No claims selected for deletion.");
     return;
   }
+    const company_id = await AsyncStorage.getItem('companyname');
 
-  console.log("Delete button pressed", selectedClaims);
-
-  // Construct payload in the format your API expects
   const deletePayload = selectedClaims.map((claimId) => ({
-    company_id: "durr", // Replace with dynamic value if needed
+    company_id: company_id, // or your dynamic company_id
     claim_id: claimId,
-    is_deleted: "True"
+    is_deleted: "True",
   }));
 
   try {
-    const response = await axios.delete(
-      `${BASEPATH}v1/client/ocr_inserts/claims_delete/`,
-      {
-        data: {
-          delete_claims: deletePayload
-        }
-      }
-    );
+    const response = await fetch(`${BASEPATH}v1/client/ocr_inserts/claims_delete/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        // add auth headers if needed, e.g. Authorization
+      },
+      body: JSON.stringify({ delete_claims: deletePayload }),
+    });
 
-    console.log("Delete successful", response.data);
+    const data = await response.json();
 
-    // Optional: Clear selected claims, refetch list, or show success message
-    setSelectedClaims([]);
-    // refreshData(); // if you have a function to reload data
+    if (response.ok) {
+      console.log("Delete successful", data);
+      setSelectedClaims([]);
+    } else {
+      console.error("Delete failed", data);
+    }
   } catch (error) {
-    console.error("Error deleting claims:", error);
+    console.error("Fetch error", error);
   }
 };
 
+const renderBottomButtons = () => {
+    if (selectedClaims.length === 1) {
+      return (
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.updateButton}>
+     <Text style={styles.updateText}>Edit</Text>
+  </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+     <Text style={styles.deleteText}>Delete</Text>
+  </TouchableOpacity> 
+        </View>
+      );
+    } else if (selectedClaims.length > 1) {
+      return (
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.secondDeleteButton} onPress={handleDelete}>
+     <Text style={styles.deleteText}>Delete</Text>
+  </TouchableOpacity> 
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.buttonRow}>
+           <TouchableOpacity style={styles.addClaimButton} onPress={handleNewClaim}>
+        <Text style={styles.addClaimText}>Add New Claim</Text>
+      </TouchableOpacity>
+          <TouchableOpacity style={styles.advanceButton} onPress={handleAdvance}>
+    <Text style={styles.advanceText}>Request Advance</Text>
+  </TouchableOpacity>
+        </View>
+      );
+    }
+  };
   return (
    <TouchableWithoutFeedback
    onPress={() => {
@@ -912,21 +984,22 @@ const handleDelete = async () => {
           renderItem={renderClaim}
         />
       )}
-<View style={styles.buttonRow}>
+{/* <View style={styles.buttonRow}>
   
       <TouchableOpacity style={styles.addClaimButton} onPress={handleNewClaim}>
         <Text style={styles.addClaimText}>Add New Claim</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity style={styles.updateButton}>
+       <TouchableOpacity style={styles.updateButton}>
      <Text style={styles.updateText}>Update</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
      <Text style={styles.deleteText}>Delete</Text>
-  </TouchableOpacity> */}
-  <TouchableOpacity style={styles.advanceButton}>
+  </TouchableOpacity> 
+  <TouchableOpacity style={styles.advanceButton} onPress={handleAdvance}>
     <Text style={styles.advanceText}>Request Advance</Text>
   </TouchableOpacity>
-      </View>
+      </View> */}
+{renderBottomButtons()}
     </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -1007,7 +1080,10 @@ const styles = StyleSheet.create({
     marginTop: 5 
   },
   buttonRow:{
-    flexDirection:'row'
+    flexDirection:'row',
+    justifyContent: "space-around",
+    marginTop: 20,
+    
   },
   addClaimButton: {
     backgroundColor: '#7E8356',
@@ -1039,10 +1115,10 @@ const styles = StyleSheet.create({
   },
   updateButton:{
     borderRadius:10,
-    backgroundColor: '#7E8356',
+    backgroundColor: '#0873CD',
     padding: 15,
     margin: 10,
-    width:"20%",
+    width:"40%",
     alignItems: 'center',
   },
   updateText:{
@@ -1053,13 +1129,21 @@ const styles = StyleSheet.create({
     borderRadius:10,
     padding:15,
     margin:10,
-    width:'20%',
-    backgroundColor:'#7E8356',
+    width:'40%',
+    backgroundColor:'#E41D1D',
     alignItems:'center',
   },
   deleteText:{
     color:'#FFFFFF',
     fontWeight:'bold',
+  },
+  secondDeleteButton:{
+    width:'90%',
+    backgroundColor:'#E41D1D',
+    borderRadius:10,
+    alignItems:'center',
+    padding:15,
+    margin:10,
   },
   searchBar: {
     flexDirection: 'row',

@@ -4261,7 +4261,10 @@ const formatCurrency = (amount) => {
 
 const HomeScreen = ({ navigation }) => {
     const { theme } = useTheme();
-
+  const [userData, setUserData] = useState({
+    name: '',
+    greeting: '',
+  });
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -4278,6 +4281,43 @@ const HomeScreen = ({ navigation }) => {
     const count = await AsyncStorage.getItem('unreadCount');
     setUnreadCount(parseInt(count || '0', 10));
   };
+    const fetchUserData = async (greeting) => {
+    try {
+           const emp_id = await AsyncStorage.getItem('username');
+    const company_id = await AsyncStorage.getItem('companyname');
+
+     if (!emp_id || !company_id) {
+       throw new Error('Missing emp_id or company_id in AsyncStorage');
+     }
+
+      const response = await axios.get(`${BASEPATH}v1/client/ocr_inserts/get_all_claims/?emp_id=${emp_id}&company_id=${company_id}`);
+      const data = response.data;
+      
+      setUserData({
+        name: data.name || 'User', // Fallback if name is not provided
+        greeting: greeting,
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      // Set fallback values in case of error
+      setUserData({
+        name: 'emp_id',
+        greeting: greeting,
+      });
+    }
+  };
+      useEffect(() => {
+    // Get greeting based on time of day
+    const hour = new Date().getHours();
+    let greeting = '';
+    if (hour < 12) greeting = 'Good Morning';
+    else if (hour < 18) greeting = 'Good Afternoon';
+    else greeting = 'Good Evening';
+    
+    // Fetch user data
+    fetchUserData(greeting);
+  }, []);
+
   const handleNotification = () => {
     navigation.navigate('Notifications');
    }
@@ -4411,7 +4451,10 @@ const HomeScreen = ({ navigation }) => {
     )}
   </TouchableOpacity>
       </View>
-
+        <View style={styles.greetingCard}>
+          <Text style={styles.greeting}>{userData.greeting}</Text>           <Text style={styles.userName}>{userData.name}</Text>
+           <Text style={styles.subGreeting}>Have a delightful day!</Text>
+         </View>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -4422,7 +4465,12 @@ const HomeScreen = ({ navigation }) => {
           />
         }
       >
-        <View style={styles.summaryContainer}>
+       
+        <ExpenseHeadChart
+          claims={dashboardData.claims}
+          policyDetails={dashboardData.policyDetails}
+        />
+         <View style={styles.summaryContainer}>
           <View style={styles.summaryRow}>
             <View style={[styles.summaryCard, { backgroundColor: '#E8F0FE' }]}>
               <Text style={styles.summaryValue}>{dashboardData.summary.totalClaims}</Text>
@@ -4449,11 +4497,6 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </View>
         </View>
-
-        <ExpenseHeadChart
-          claims={dashboardData.claims}
-          policyDetails={dashboardData.policyDetails}
-        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -4482,6 +4525,28 @@ const styles = StyleSheet.create({
   summaryValue: { fontSize: 24, fontWeight: 'bold', color: '#333', marginBottom: 4 },
   summaryLabel: { fontSize: 14, color: '#666', marginBottom: 6 },
   summaryAmount: { fontSize: 16, fontWeight: '500', color: '#333' },
+    greetingCard: {
+    margin: 20,
+    padding: 20,
+    backgroundColor: '#111',
+    borderRadius: 16,
+  },
+  greeting: {
+    color: '#fff',
+    opacity: 0.7,
+    fontSize: 14,
+  },
+  userName: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginVertical: 5,
+  },
+  subGreeting: {
+    color: '#fff',
+    opacity: 0.7,
+    fontSize: 14,
+  },
 });
 
 export default HomeScreen;

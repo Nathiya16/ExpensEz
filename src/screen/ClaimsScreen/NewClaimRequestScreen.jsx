@@ -2734,47 +2734,60 @@ const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
   }, [selectedMainCategory, subCategoriesMap]);
 
   const fetchPolicies = async () => {
-    try {
-      const response = await axios.post(
-        'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
-        {
-          company_id: 'durr',
-          operation: 'read',
-          grade_id: 53,
-        }
-      );
+  try {
+    const emp_id = await AsyncStorage.getItem('username');
+    const company_id = await AsyncStorage.getItem('companyname');
+    const grade_id_string = await AsyncStorage.getItem('grade_id');
 
-      const apiData = response?.data?.data ?? [];
+    console.log("📦 Fetched grade_id from storage:", grade_id_string);
 
-      const mains = apiData.map(item => ({
-        id: item.main_expense_head,
-        name: item.main_expense_name,
-      }));
-
-      const subsMap = {};
-      apiData.forEach(item => {
-        const subList = item.policy_details.map(detail => ({
-          id: detail.sub_expense_head,
-          name: `${detail.sub_expense_name} (${detail.limit_name})`,
-        }));
-        subsMap[item.main_expense_head] = subList;
-      });
-
-      console.log('✅ Main Categories:', mains);
-      console.log('✅ Sub Categories Map:', subsMap);
-
-      setMainCategories(mains);
-      setSubCategoriesMap(subsMap);
-
-      if (mains.length > 0) {
-        setSelectedMainCategory(mains[0].id);
-      }
-
-    } catch (error) {
-      console.error('❌ Error fetching policies:', error);
-      Alert.alert('Error', 'Failed to load policy data');
+    if (!grade_id_string) {
+      console.warn("⚠️ No grade_id found in storage.");
+      return;
     }
-  };
+
+    const response = await axios.post(
+      'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
+      {
+        company_id: company_id,
+        operation: 'read',
+        grade_id: parseInt(grade_id_string), // make sure it's sent as a number
+      }
+    );
+
+    const apiData = response?.data?.data ?? [];
+
+    const mains = apiData.map(item => ({
+      id: item.main_expense_head,
+      name: item.main_expense_name,
+    }));
+
+    const subsMap = {};
+    apiData.forEach(item => {
+      const subList = item.policy_details.map(detail => ({
+        id: detail.sub_expense_head,
+        name: `${detail.sub_expense_name} (${detail.limit_name})`,
+      }));
+      subsMap[item.main_expense_head] = subList;
+    });
+
+    console.log('✅ Main Categories:', mains);
+    console.log('✅ Sub Categories Map:', subsMap);
+
+    setMainCategories(mains);
+    setSubCategoriesMap(subsMap);
+
+    if (mains.length > 0) {
+      setSelectedMainCategory(mains[0].id);
+    }
+
+  } catch (error) {
+    console.error('❌ Error fetching policies:', error.response?.data || error.message);
+    Alert.alert('Error', 'Failed to load policy data');
+  }
+};
+
+
   useEffect(() => {
   if (entity) {
     setEditedDate(entity?.date || '');
@@ -2950,7 +2963,7 @@ const selectedPolicy = policyMap[mainCategory]?.find(
 
 
 if (!selectedPolicy) {
-  return Alert.alert("Error", "Could not find matching policy details.");
+  return Alert.alert("Error", ".");
 }
 
 
@@ -3055,19 +3068,6 @@ const payload = {
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: theme.text }]}>Main Expense Category</Text>
             <View style={[styles.pickerContainer, { backgroundColor: theme.background, borderColor: theme.borderColor }]}>
-              {/* <Picker
-                selectedValue={mainCategory}
-                style={[styles.picker, { color: theme.text }]}
-                dropdownIconColor={theme.text}
-                onValueChange={(value) => {
-                  setMainCategory(value);
-                  setSubCategory(null);
-                }}>
-                <Picker.Item label="Select Main Category" value="" enabled={false} />
-                {mainCategories.map(item => (
-                  <Picker.Item key={item.id} label={item.name} value={item.name} />
-                ))}
-              </Picker> */}
               <Picker
         selectedValue={selectedMainCategory}
         onValueChange={(itemValue) => setSelectedMainCategory(itemValue)}
@@ -3079,74 +3079,33 @@ const payload = {
             </View>
           </View>
 
-          {mainCategory && (
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: theme.text }]}>Sub Expense Category</Text>
-              <View style={[styles.pickerContainer, { backgroundColor: theme.background, borderColor: theme.borderColor }]}>
-                {selectedMainCategory && subCategoriesMap[selectedMainCategory] && (
-  <>
-    <Text style={{ fontWeight: 'bold', marginTop: 20 }}>Sub Expense</Text>
-
-    <Picker
-      selectedValue={selectedSubCategory}
-      onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
-      enabled={subCategoriesMap[selectedMainCategory]?.length > 0}
+  
+         {selectedMainCategory && (
+  <View style={styles.inputGroup}>
+    <Text style={[styles.label, { color: theme.text }]}>Sub Expense Category</Text>
+    <View
+      style={[
+        styles.pickerContainer,
+        { backgroundColor: theme.background, borderColor: theme.borderColor },
+      ]}
     >
-      {subCategoriesMap[selectedMainCategory].map((sub) => (
-        <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
-      ))}
-    </Picker>
-  </>
-)}
-
-                {/* <Picker
-  selectedValue={subCategory}
-  style={[styles.picker, { color: theme.text }]}
-  dropdownIconColor={theme.text}
-  onValueChange={setSubCategory}
->
-  <Picker.Item label="Select Subcategory" value="" enabled={false} />
-  {(policyMap[mainCategory] || []).map((item, index) => (
-    <Picker.Item
-      key={index}
-      label={item.sub_expense_name}
-      value={item.sub_expense_name}
-    />
-  ))}
-</Picker> */}
-{/* {selectedMainCategory && subCategoriesMap[selectedMainCategory]?.length > 0 ? (
-        <Picker
-          selectedValue={selectedSubCategory}
-          onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
-        >
-          {subCategoriesMap[selectedMainCategory].map((sub) => (
+      <Picker
+        selectedValue={selectedSubCategory}
+        onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
+        enabled={subCategoriesMap[selectedMainCategory]?.length > 0}
+      >
+        {subCategoriesMap[selectedMainCategory] && subCategoriesMap[selectedMainCategory].length > 0 ? (
+          subCategoriesMap[selectedMainCategory].map((sub) => (
             <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
-          ))}
-        </Picker>
+          ))
         ) : (
-        <Text style={{ marginTop: 10, color: 'gray' }}>No sub expenses available</Text>
-      )} */}
-
-<Text style={{ fontWeight: 'bold', marginTop: 20 }}>Sub Expense</Text>
-
-<Picker
-  selectedValue={selectedSubCategory}
-  onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
-  enabled={subCategoriesMap[selectedMainCategory]?.length > 0}
->
-  {(subCategoriesMap[selectedMainCategory] || []).length > 0 ? (
-    subCategoriesMap[selectedMainCategory].map((sub) => (
-      <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
-    ))
-  ) : (
-    <Picker.Item label="No sub expenses available" value="" />
-  )}
-</Picker>
-
-              </View>
-            </View>
-          )}
-          
+          <Picker.Item label="No sub expenses available" value="" />
+        )}
+      </Picker>
+    </View>
+  </View>
+)}
+ 
 
           {subCategory && (
             <View style={[styles.inputGroup, { paddingTop: 10 }]}>
