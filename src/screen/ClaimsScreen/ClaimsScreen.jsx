@@ -880,7 +880,30 @@ const renderBottomButtons = () => {
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.secondDeleteButton} onPress={handleDelete}>
      <Text style={styles.deleteText}>Delete</Text>
-  </TouchableOpacity> 
+  </TouchableOpacity>
+  {/* <Modal
+            animationType="slide"
+            transparent={true}
+            visible={logoutModalVisible}
+            onRequestClose={closeLogoutModal}
+          >
+            <View style={[Styles.modal,]}>
+              <View style={[Styles.modalContent,{ color: theme.text },{ backgroundColor: theme.background }]}>
+                <Text style={[Styles.modalTitle,{ color: theme.text }]}>Log out</Text>
+                <Text style={[Styles.modalMessage,{ color: theme.text }]}>
+                  Are you sure you want to log out? You'll need to log in again to use the app.
+                </Text>
+                <View style={Styles.buttonContainer}>
+                  <TouchableOpacity style={[Styles.cancelButton,{ borderColor: theme.borderColor},{ backgroundColor: theme.background }]} onPress={closeLogoutModal}>
+                    <Text style={[Styles.cancelText, { color: theme.text }]}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={Styles.logoutConfirmButton} onPress={handleLogoutConfirm}>
+                    <Text style={Styles.logoutConfirmText}>Log out</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>  */}
         </View>
       );
     } else {
@@ -896,6 +919,13 @@ const renderBottomButtons = () => {
       );
     }
   };
+  //  const handledelete = () => {
+  //   setLogoutModalVisible(false);
+  //   navigation.navigate("Login");
+  // };
+
+  // const openLogoutModal = () => setLogoutModalVisible(true);
+  // const closeLogoutModal = () => setLogoutModalVisible(false);
   return (
    <TouchableWithoutFeedback
    onPress={() => {

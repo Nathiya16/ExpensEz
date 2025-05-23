@@ -2318,6 +2318,765 @@
 //   };
 
 
+// import React, { useEffect, useState } from 'react';
+// import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image, Alert } from 'react-native';
+// import DateTimePicker from '@react-native-community/datetimepicker';
+// import { Picker } from '@react-native-picker/picker';
+// import Icon from 'react-native-vector-icons/Ionicons';
+// import axios from 'axios';
+// import { useTheme } from '../../theme/useTheme';
+// import { BASEPATH } from '../config';
+// import {launchImageLibrary} from 'react-native-image-picker';
+// import { PermissionsAndroid, Platform, Linking } from 'react-native';
+// import { ActivityIndicator } from 'react-native';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// const NewClaimRequestScreen = ({ navigation }) => {
+//   const { theme } = useTheme();
+//   const [mainCategory, setMainCategory] = useState('');
+//   const [subCategory, setSubCategory] = useState('');
+//   const [amount, setAmount] = useState(null);
+//   const [date, setDate] = useState(new Date());
+//   const [showDatePicker, setShowDatePicker] = useState(false);
+//   const [mainCategories, setMainCategories] = useState([]);
+//   const [policyMap, setPolicyMap] = useState({});
+//   const [showPolicyDetails, setShowPolicyDetails] = useState(false);
+//   const [selectedImage, setSelectedImage] = useState(null); 
+//   const [loading, setLoading] = useState(false); 
+//   const [entity, setEntity] = useState(null);
+//   const [companyId, setCompanyId] = useState('');
+//   const [empId, setEmpId] = useState('');
+//   const [description, setDescription] = useState('');
+
+//   const onDateChange = (event, selectedDate) => {
+//     const currentDate = selectedDate || date;
+//     setShowDatePicker(false);
+//     setDate(currentDate);
+//   };
+
+//   const formatDate = (date) => {
+//     const day = date.getDate().toString().padStart(2, '0');
+//     const month = (date.getMonth() + 1).toString().padStart(2, '0');
+//     const year = date.getFullYear();
+//     return `${day}/${month}/${year}`;
+//   };
+
+//   const [apiData, setApiData] = useState({
+//     amount: '',
+//     policyMap: {},
+//     expense_head: '',  
+//     subexpense_head: '',  
+//     date: '', 
+//   });
+  
+//   const [editedDate, setEditedDate] = useState('');
+//   const [editedTotal, setEditedTotal] = useState('');
+
+//   const handleCancel = () => {
+//     navigation.navigate('Claims');
+//   };
+  
+//   useEffect(() => {
+//     const fetchPolicies = async () => {
+//       try {
+//         const response = await axios.get(`${BASEPATH}v1/client/policy/get_all_policies2/?operation=read&company_id=durr`);
+//         const apiData = response?.data?.data || [];
+
+//         // Create categories using the ID as key
+//         const categories = apiData.map(item => ({
+//           id: item.main_expense_head,
+//           name: item.main_expense_name,
+//         }));
+
+//         // Create policy map using the main expense head ID as key
+//         const map = {};
+//         apiData.forEach(item => {
+//           map[item.main_expense_head] = item.policy_details;
+//         });
+
+//         console.log('Categories:', categories);
+//         console.log('Policy Map:', map);
+
+//         setMainCategories(categories);
+//         setPolicyMap(map);
+//       } catch (error) {
+//         console.error('Policy fetch error:', error);
+//         Alert.alert('Error', 'Failed to fetch policies');
+//       }
+//     };
+
+//     fetchPolicies();
+//   }, []);
+  
+//   useEffect(() => {
+//     if (entity) {
+//       setEditedDate(entity?.date || '');
+//       setEditedTotal(entity?.total?.toString() || '');
+//     }
+//   }, [entity]);
+
+//   const handleChooseImage = () => {
+//     launchImageLibrary(
+//       {
+//         mediaType: 'photo',
+//         includeBase64: true,
+//         quality: 0.8,
+//       },
+//       (response) => {
+//         if (response.didCancel) {
+//           console.log('User cancelled image picker');
+//         } else if (response.errorCode) {
+//           console.log('Image Picker Error:', response.errorMessage);
+//           Alert.alert('Error', 'Failed to pick image');
+//         } else {
+//           const base64Image = response.assets?.[0]?.base64;
+//           if (base64Image) {
+//             setSelectedImage({
+//               uri: response.assets[0].uri,
+//               base64: base64Image,
+//               type: response.assets[0].type,
+//               fileName: response.assets[0].fileName,
+//             });
+//           }
+//         }
+//       }
+//     );
+//   };
+
+//   const handleUploadBill = async () => {
+//     if (!selectedImage) {
+//       Alert.alert('No Image Selected', 'Please choose an image before uploading.');
+//       return;
+//     }
+
+//     if (!selectedImage.base64 || !selectedImage.uri) {
+//       Alert.alert('Image Error', 'Image is missing base64 or URI data.');
+//       return;
+//     }
+
+//     setLoading(true);
+
+//     try {
+//       const formData = new FormData();
+
+//       // Append the image file
+//       formData.append('file', {
+//         uri: selectedImage.uri,
+//         type: selectedImage.type || 'image/jpeg',
+//         name: selectedImage.fileName || 'upload.jpg',
+//       });
+
+//       // Append the payload with the base64 string as 'document'
+//       const payload = {
+//         company_id: companyId || 'CompanyID',
+//         expense_head: 'MainExpense',
+//         subexpense_head: 'SubExpense',
+//         document: [`data:image/jpeg;base64,${selectedImage.base64}`],
+//       };
+
+//       formData.append('data', JSON.stringify(payload));
+
+//       // Upload the image and data
+//       const response = await axios.post(
+//         `${BASEPATH}v1/client/ocr_model_check/ocr_checks_creator_four/`,
+//         formData,
+//         {
+//           headers: {
+//             'Content-Type': 'multipart/form-data',
+//           },
+//         }
+//       );
+
+//       const data = response.data;
+
+//       // Update UI with returned data
+//       setEntity(data.entities?.[0]);
+//       setApiData({
+//         expense_head: data.expense_head,
+//         subexpense_head: data.subexpense_head,
+//       });
+
+//       Alert.alert('Success', 'Image uploaded and data populated!');
+//     } catch (err) {
+//       console.error('Upload error:', err.response?.data || err.message);
+
+//       let errorMessage = 'Something went wrong. Please try again later.';
+//       const detail = err.response?.data?.detail;
+
+//       if (Array.isArray(detail)) {
+//         errorMessage = detail.map((e) => e.msg || JSON.stringify(e)).join('\n');
+//       } else if (typeof detail === 'string') {
+//         errorMessage = detail;
+//       }
+
+//       Alert.alert('Upload failed', errorMessage);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const loadData = async () => {
+//       try {
+//         const storedCompanyId = await AsyncStorage.getItem('companyname');
+//         const storedEmpId = await AsyncStorage.getItem('username');
+
+//         if (storedCompanyId) setCompanyId(storedCompanyId);
+//         if (storedEmpId) setEmpId(storedEmpId);
+//       } catch (error) {
+//         console.error("Failed to load user data", error);
+//       }
+//     };
+
+//     loadData();
+//   }, []);
+
+//   const handleSubmit = async () => {
+//     console.log("DEBUGGING VALUES:");
+//     console.log("mainCategory:", mainCategory, "type:", typeof mainCategory);
+//     console.log("subCategory:", subCategory, "type:", typeof subCategory);
+//     console.log("mainCategories:", mainCategories);
+//     console.log("policyMap keys:", Object.keys(policyMap));
+    
+//     // Validation
+//     if (!mainCategory || mainCategory === '') {
+//       Alert.alert("Error", "Main category is required");
+//       return;
+//     }
+    
+//     if (!subCategory || subCategory === '') {
+//       Alert.alert("Error", "Sub category is required");
+//       return;
+//     }
+
+//     if (!selectedImage) {
+//       Alert.alert("Error", "Please upload a bill image");
+//       return;
+//     }
+
+//     // Find the selected policy using the main category ID
+//     const selectedPolicy = policyMap[mainCategory]?.find(
+//       (item) => item.sub_expense_head === subCategory
+//     );
+    
+//     console.log("Selected policy:", selectedPolicy);
+
+//     if (!selectedPolicy) {
+//       Alert.alert("Error", "Could not find matching policy details.");
+//       return;
+//     }
+
+//     const policyId = selectedPolicy.policy_detail_id.toString();
+    
+//     // Use the IDs directly as they are already the correct values
+//     const mainExpenseHeadId = String(mainCategory);
+//     const subExpenseHeadId = String(subCategory);
+
+//     console.log("Values for payload:");
+//     console.log("mainExpenseHeadId:", mainExpenseHeadId);
+//     console.log("subExpenseHeadId:", subExpenseHeadId);
+//     console.log("policyId:", policyId);
+
+//     const isDateEdited = editedDate && editedDate !== entity?.date;
+//     const isAmountEdited = editedTotal && editedTotal !== entity?.total?.toString();
+
+//     const finalDate = isDateEdited ? editedDate : entity?.date || "";
+//     const finalAmount = isAmountEdited ? editedTotal : entity?.total || "0";
+
+//     const cleanedFinalAmount = Number(finalAmount);
+//     if (isNaN(cleanedFinalAmount)) {
+//       Alert.alert("Invalid amount", "The amount must be a number.");
+//       return;
+//     }
+
+//     const payload = {
+//       employee_claim_data: [
+//         {
+//           company_id: companyId.toString(),
+//           policy_id: policyId,
+//           expense_head: mainExpenseHeadId,
+//           subexpense_head: subExpenseHeadId,
+//           claim_status: "normal",
+//           claim_type: "regular",
+//           emp_id: empId.toString(),
+//           year: "2025",
+//           advance_id: 71,
+//           claim_amount: cleanedFinalAmount,
+//           advance_amount: 0,
+//           descriptions: description || "No description",
+//           document: [
+//             {
+//               ocr_amount: Number(entity?.total || 0),
+//               ocr_date: entity?.date || "",
+//               booking_id: entity?.bill_no || "",
+//               ride_id: entity?.bill_no || "",
+//               from_address: entity?.from_address || "",
+//               to_address: entity?.to_address || "",
+//               doc_name: entity?.org || "",
+//               distance: entity?.distance || "",
+//               gst_no: entity?.gstno || "",
+//               times: entity?.time || "",
+//               invoice_no: entity?.invoiceno || "",
+//               page1: `data:image/jpeg;base64,${selectedImage?.base64 || ""}`,
+//               type: "image",
+//               ...(isAmountEdited && { amount: cleanedFinalAmount }),
+//               ...(isDateEdited && { date: finalDate }),
+//             },
+//           ],
+//         },
+//       ],
+//     };
+
+//     console.log("Final payload:", JSON.stringify(payload, null, 2));
+
+//     try {
+//       const response = await axios.post(
+//         `${BASEPATH}v1/client/ocr_inserts/ocr_inserting/`,
+//         payload,
+//         {
+//           headers: { 'Content-Type': 'application/json' },
+//         }
+//       );
+
+//       if (response?.data?.status === 200) {
+//         console.log("API response:", response.data);
+//         navigation.navigate('SubmitClaim');
+//       } else {
+//         Alert.alert('Error', 'Failed to submit claim.');
+//       }
+//     } catch (error) {
+//       console.error("API Error:", error);
+//       Alert.alert('Error', 'Something went wrong while submitting the claim.');
+//     }
+//   };
+
+//   return (
+//     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+//       <ScrollView contentContainerStyle={styles.scrollContainer}>
+//         <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.borderColor }]}>
+//           <Text style={[styles.headerTitle, { color: theme.text }]}>New Claim Request</Text>
+//         </View>
+
+//         <View style={styles.formContainer}>
+//           <View style={styles.inputGroup}>
+//             <Text style={[styles.label, { color: theme.text }]}>Main Expense Category</Text>
+//             <View style={[styles.pickerContainer, { backgroundColor: theme.background, borderColor: theme.borderColor }]}>
+//               <Picker
+//                 selectedValue={mainCategory}
+//                 style={[styles.picker, { color: theme.text }]}
+//                 dropdownIconColor={theme.text}
+//                 onValueChange={(value) => {
+//                   console.log("Main category selected:", value);
+//                   setMainCategory(value);
+//                   setSubCategory('');
+//                 }}>
+//                 <Picker.Item label="Select Main Category" value="" />
+//                 {mainCategories.map(item => (
+//                   <Picker.Item key={item.id} label={item.name} value={item.id} />
+//                 ))}
+//               </Picker>
+//             </View>
+//           </View>
+
+//           {mainCategory && mainCategory !== '' && (
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, { color: theme.text }]}>Sub Expense Category</Text>
+//               <View style={[styles.pickerContainer, { backgroundColor: theme.background, borderColor: theme.borderColor }]}>
+//                 <Picker
+//                   selectedValue={subCategory}
+//                   style={[styles.picker, { color: theme.text }]}
+//                   dropdownIconColor={theme.text}
+//                   onValueChange={(value) => {
+//                     console.log("Sub category selected:", value);
+//                     setSubCategory(value);
+//                   }}
+//                 >
+//                   <Picker.Item label="Select Subcategory" value="" />
+//                   {(policyMap[mainCategory] || []).map((item, index) => (
+//                     <Picker.Item
+//                       key={index}
+//                       label={item.sub_expense_name}
+//                       value={item.sub_expense_head}
+//                     />
+//                   ))}
+//                 </Picker>
+//               </View>
+//             </View>
+//           )}
+
+//           {subCategory && subCategory !== '' && (
+//             <View style={[styles.inputGroup, { paddingTop: 10 }]}>
+//               <View style={styles.policyHeader}>
+//                 <Text style={[styles.label, { color: theme.text }]}>View Policy</Text>
+//                 <TouchableOpacity onPress={() => setShowPolicyDetails(!showPolicyDetails)}>
+//                   <Icon
+//                     name={showPolicyDetails ? "eye-off-outline" : "eye-outline"}
+//                     size={20}
+//                     color={theme.text}
+//                   />
+//                 </TouchableOpacity>
+//               </View>
+
+//               {showPolicyDetails && (() => {
+//                 const selectedPolicy = policyMap[mainCategory]?.find(
+//                   (item) => item.sub_expense_head === subCategory
+//                 );
+                
+//                 if (!selectedPolicy) {
+//                   return (
+//                     <View style={[styles.policyContainer, { backgroundColor: theme.background }]}>
+//                       <Text style={[styles.policyItem, { color: theme.text }]}>No policy details found</Text>
+//                     </View>
+//                   );
+//                 }
+                
+//                 return (
+//                   <View style={[styles.policyContainer, { backgroundColor: theme.background }]}>
+//                     <Text style={[styles.policyItem, { color: theme.text }]}>Amount Limit: ₹{selectedPolicy.policy_amount}</Text>
+//                     <Text style={[styles.policyItem, { color: theme.text }]}>Frequency: {selectedPolicy.frequency}</Text>
+//                     <Text style={[styles.policyItem, { color: theme.text }]}>Max Claims: {selectedPolicy.no_of_times_claim}</Text>
+//                     <Text style={[styles.policyItem, { color: theme.text }]}>Valid From: {selectedPolicy.effective_from}</Text>
+//                     <Text style={[styles.policyItem, { color: theme.text }]}>Valid To: {selectedPolicy.effective_end}</Text>
+//                   </View>
+//                 );
+//               })()}
+//             </View>
+//           )}
+        
+
+//           <View style={styles.inputGroup}>
+//             {/* Image Picker Button */}
+//             <TouchableOpacity 
+//               style={[styles.uploadButton, { backgroundColor: theme.background, borderColor: theme.borderColor }]}
+//               onPress={handleChooseImage}>
+//               <Icon name="image-outline" size={24} color={theme.text} />
+//               <Text style={[styles.uploadText, { color: theme.text }]}>Choose Image</Text>
+//             </TouchableOpacity>
+
+//             {/* Selected Image Display */}
+//             {selectedImage && (
+//               <View style={styles.selectedImageContainer}>
+//                 <Image 
+//                   source={{ uri: `data:image/jpeg;base64,${selectedImage.base64}` }} 
+//                   style={styles.selectedImage} 
+//                 />
+//                 <Text style={[styles.imageInfo, { color: theme.text }]}>Image Selected</Text>
+//               </View>
+//             )}
+
+//             {/* Upload Button */}
+//             {selectedImage && !loading && (
+//               <TouchableOpacity
+//                 style={[styles.uploadButton, { backgroundColor: theme.background, borderColor: theme.borderColor }]}
+//                 onPress={handleUploadBill}
+//               >
+//                 <Icon name="cloud-upload-outline" size={24} color={theme.text} />
+//                 <Text style={[styles.uploadText, { color: theme.text }]}>Upload Bill</Text>
+//               </TouchableOpacity>
+//             )}
+
+//             {/* Loading Indicator */}
+//             {loading && (
+//               <View style={styles.loadingContainer}>
+//                 <ActivityIndicator size="large" color={theme.text} />
+//                 <Text style={[styles.loadingText, { color: theme.text }]}>Uploading...</Text>
+//               </View>
+//             )}
+//           </View>
+
+//           {/* Entity Data Display */}
+//           <View>
+//             {entity?.date && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Date</Text>
+//                 <TextInput
+//                   value={editedDate}
+//                   onChangeText={setEditedDate}
+//                   editable={true}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text }]}
+//                 />
+//                 <Text style={styles.note}>*Change the date if it is incorrect.</Text>
+//               </View>
+//             )}
+
+//             {entity?.total && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Total</Text>
+//                 <TextInput
+//                   value={editedTotal}
+//                   onChangeText={setEditedTotal}
+//                   keyboardType="numeric"
+//                   editable={true}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text }]}
+//                 />
+//                 <Text style={styles.note}>*Change the total if it is incorrect.</Text>
+//               </View>
+//             )}
+
+//             {entity?.bill_no && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Bill No</Text>
+//                 <TextInput
+//                   value={entity.bill_no}
+//                   editable={false}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.time && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Time</Text>
+//                 <TextInput
+//                   value={entity.time}
+//                   editable={false}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.distance && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Distance</Text>
+//                 <TextInput
+//                   value={entity.distance}
+//                   editable={false}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.from_address && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>From Address</Text>
+//                 <TextInput
+//                   value={entity.from_address}
+//                   editable={false}
+//                   multiline
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.to_address && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>To Address</Text>
+//                 <TextInput
+//                   value={entity.to_address}
+//                   editable={false}
+//                   multiline
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.name && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Name</Text>
+//                 <TextInput
+//                   value={entity.name}
+//                   editable={false}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.org && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Organization</Text>
+//                 <TextInput
+//                   value={entity.org}
+//                   editable={false}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.gstno && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>GST NO</Text>
+//                 <TextInput
+//                   value={entity.gstno}
+//                   editable={false}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+
+//             {entity?.invoiceno && (
+//               <View style={{ marginBottom: 10 }}>
+//                 <Text style={[styles.label, { color: theme.text }]}>Invoice No</Text>
+//                 <TextInput
+//                   value={entity.invoiceno}
+//                   editable={false}
+//                   style={[styles.textInput, { borderColor: theme.borderColor, color: theme.text, backgroundColor: '#f5f5f5' }]}
+//                 />
+//               </View>
+//             )}
+//           </View>
+
+//           <View style={styles.buttonContainer}>
+//             <TouchableOpacity
+//               style={[styles.cancelButton, { borderColor: theme.borderColor}]}
+//               onPress={handleCancel}
+//             >
+//               <Text style={[styles.cancelButtonText, { color: theme.text }]}>Cancel</Text>
+//             </TouchableOpacity>
+//             <TouchableOpacity
+//               style={[styles.submitButton, { backgroundColor: theme.buttonBg }]}
+//               onPress={handleSubmit}
+//             >
+//               <Text style={[styles.submitButtonText, { color: theme.buttonTextColor }]}>Submit</Text>
+//             </TouchableOpacity>
+//           </View>
+//         </View>
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1, 
+//     backgroundColor: '#fff' 
+//   },
+//   scrollContainer: { 
+//     paddingBottom: 80
+//   },
+//   header: {
+//     padding: 30,
+//     backgroundColor: '#fff',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//   },
+//   headerTitle: { 
+//     fontSize: 18, 
+//     fontWeight: 'bold', 
+//     color: '#000' 
+//   },
+//   formContainer: { 
+//     padding: 15 
+//   },
+//   inputGroup: {
+//     marginBottom: 10,
+//   },
+//   label: { 
+//     fontSize: 14, 
+//     color: '#333', 
+//     marginBottom: 5 
+//   },
+//   pickerContainer: {
+//     borderWidth: 1,
+//     borderColor: '#ddd',
+//     borderRadius: 8,
+//     backgroundColor: '#fff',
+//   },
+//   picker: { 
+//     flex: 1,
+//     height: 55 
+//   },
+//   textInput: {
+//     borderWidth: 1,
+//     borderColor: '#ddd',
+//     borderRadius: 8,
+//     padding: 12,
+//     fontSize: 16,
+//     backgroundColor: '#fff',
+//   },
+//   policyHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//   },
+//   policyContainer: {
+//     backgroundColor: '#f1f1f1',
+//     padding: 10,
+//     borderRadius: 8,
+//     marginTop: 5,
+//   },
+//   policyItem: {
+//     fontSize: 14,
+//     color: '#333',
+//     marginBottom: 4,
+//   },
+//   selectedImageContainer: {
+//     marginVertical: 10,
+//     alignItems: 'center',
+//   },
+//   selectedImage: {
+//     width: 100,
+//     height: 100,
+//     marginBottom: 10,
+//     borderRadius: 8,
+//   },
+//   imageInfo: {
+//     fontSize: 14,
+//     color: '#555',
+//   },
+//   loadingContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     marginVertical: 20,
+//   },
+//   loadingText: {
+//     marginLeft: 10,
+//     fontSize: 16,
+//     fontWeight: '500',
+//   },
+//   uploadButton: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     borderWidth: 1,
+//     borderColor: '#ddd',
+//     borderRadius: 8,
+//     padding: 12,
+//     backgroundColor: '#fff',
+//     justifyContent: 'center',
+//     marginVertical: 5,
+//   },
+//   uploadText: { 
+//     marginLeft: 8, 
+//     color: '#333' 
+//   },
+//   note: {
+//     color: '#FF0000',
+//     fontSize: 12,
+//     marginTop: 5,
+//   },
+//   buttonContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginTop: 40,
+//   },
+//   cancelButton: {
+//     flex: 1,
+//     padding: 12,
+//     alignItems: 'center',
+//     borderRadius: 8,
+//     marginRight: 10,
+//     borderWidth: 1,
+//     borderColor: '#b5b5b1',
+//   },
+//   cancelButtonText: {
+//     color: '#333', 
+//     fontWeight: '500'
+//   },
+//   submitButton: {
+//     flex: 1,
+//     backgroundColor: '#7E8356',
+//     padding: 12,
+//     alignItems: 'center',
+//     borderRadius: 8,
+//   },
+//   submitButtonText: { 
+//     color: '#fff', 
+//     fontWeight: '500' 
+//   },
+// });
+
+// export default NewClaimRequestScreen;
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -2384,340 +3143,7 @@ const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
     navigation.navigate('Claims');
   };
   
-  
-  
-  
-//const [employeeGrade, setEmployeeGrade] = useState(null);
 
-// const fetchPolicies = async () => {
-//   try {
-//     const response = await axios.post(`http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/`, {
-//       operation: "read",
-//       company_id: "durr", 
-//     });
-// console.log("API Response:", response.data);
-//     const apiData = response?.data?.data || [];
-
-//     const mainCategories = [];
-//     const subCategories = [];
-
-//     apiData.forEach(item => {
-//       const mainExpenseName = item.main_expense_name;
-//       const mainExpenseHead = item.main_expense_head;
-
-//       const matchingPolicyDetails = item.policy_details.filter(detail =>
-//         detail.employee_grades.some(grade => grade.grade_name === employeeGrade)
-//       );
-
-//       if (matchingPolicyDetails.length > 0) {
-//         if (!mainCategories.find(cat => cat.id === mainExpenseHead)) {
-//           mainCategories.push({
-//             id: mainExpenseHead,
-//             name: mainExpenseName,
-//           });
-//         }
-
-//         matchingPolicyDetails.forEach(detail => {
-//           subCategories.push({
-//             id: detail.sub_expense_head,
-//             name: `${detail.sub_expense_name} (${detail.limit_name})`,
-//             mainId: mainExpenseHead,
-//           });
-//         });
-//       }
-//     });
-
-//     setMainCategories(mainCategories);
-//     setSubCategories(subCategories);
-//   } catch (error) {
-//     console.error("Error fetching data:", error?.response?.data || error.message);
-//     Alert.alert("Something went wrong while loading policies.");
-//   }
-// };
-// useEffect(() => {
-//   const checkStorage = async () => {
-//     const company_id = await AsyncStorage.getItem('companyname');
-//     console.log("Company ID from AsyncStorage:", company_id);
-//   };
-
-//   checkStorage();
-// }, []);
-
-// useEffect(() => {
-//   const fetchIfReady = async () => {
-//     const company_id = await AsyncStorage.getItem('companyname');
-//     console.log("Inside fetchIfReady:", { employeeGrade, company_id });
-
-//     if (employeeGrade && company_id) {
-//       fetchPolicies(); // 👈 will trigger if both are present
-//     } else {
-//       console.log("Still waiting for both values...");
-//     }
-//   };
-
-//   fetchIfReady();
-// }, [employeeGrade]);
-
-
-// useEffect(() => {
-//   const initialize = async () => {
-//     const grade = await AsyncStorage.getItem('grade');
-//     const company_id = await AsyncStorage.getItem('companyname');
-
-//     console.log("Init grade:", grade);
-//     console.log("Init company_id:", company_id);
-
-//     if (grade) setEmployeeGrade(grade);
-//     if (company_id) setCompanyId(company_id); // Optional if not already state
-
-//     if (grade && company_id) {
-//       fetchPolicies();
-//     }
-//   };
-
-//   initialize();
-// }, []);
-
-
-// const fetchPolicies = async () => {
-//   console.log("Inside fetchPolicies...");
-
-//   try {
-//     const emp_id = await AsyncStorage.getItem('username');
-//     const company_id = await AsyncStorage.getItem('companyname');
-
-//     if (!emp_id || !company_id) {
-//       throw new Error('Missing emp_id or company_id in AsyncStorage');
-//     }
-
-//     console.log("Calling fetchPolicies with:", { company_id });
-
-//     const response = await axios.post(
-//       `http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/`,
-//       {
-//         operation: "read",
-//         company_id, // ✅ use the one from AsyncStorage
-//       }
-//     );
-
-//     console.log("API response:", response.data);
-
-//     const apiData = response?.data?.data || [];
-
-//     const mainCategories = [];
-//     const subCategories = [];
-
-//     apiData.forEach(item => {
-//       const mainExpenseName = item.main_expense_name;
-//       const mainExpenseHead = item.main_expense_head;
-
-//       const matchingPolicyDetails = item.policy_details.filter(detail =>
-//         detail.employee_grades.some(grade => grade.grade_name === employeeGrade)
-//       );
-
-//       if (matchingPolicyDetails.length > 0) {
-//         if (!mainCategories.find(cat => cat.id === mainExpenseHead)) {
-//           mainCategories.push({
-//             id: mainExpenseHead,
-//             name: mainExpenseName,
-//           });
-//         }
-
-//         matchingPolicyDetails.forEach(detail => {
-//           subCategories.push({
-//             id: detail.sub_expense_head,
-//             name: `${detail.sub_expense_name} (${detail.limit_name})`,
-//             mainId: mainExpenseHead,
-//           });
-//         });
-//       }
-//     });
-
-//     setMainCategories(mainCategories);
-//     setSubCategories(subCategories);
-
-//     const policyMapTemp = {};
-//     mainCategories.forEach(cat => {
-//       policyMapTemp[cat.name] = subCategories.filter(sub => sub.mainId === cat.id);
-//     });
-//     setPolicyMap(policyMapTemp);
-
-//   } catch (error) {
-//     console.error("Error fetching data:", error?.response?.data || error.message);
-//     Alert.alert("Something went wrong while loading policies.");
-//   }
-// };
-// useEffect(() => {
-//   console.log("Current employeeGrade:", employeeGrade);
-// }, [employeeGrade]);
-
-// useEffect(() => {
-//   if (employeeGrade) {
-//     fetchPolicies();
-//   }
-// }, [employeeGrade]);
-// const fetchPolicies = async () => {
-//   console.log("Inside fetchPolicies...");
-
-//   try {
-//     const emp_id = await AsyncStorage.getItem('username');
-//     const company_id = await AsyncStorage.getItem('companyname');
-//     console.log("Company ID from AsyncStorage:", company_id);
-
-//     if (!emp_id || !company_id) {
-//       throw new Error('Missing emp_id or company_id in AsyncStorage');
-//     }
-
-//     const response = await axios.post(
-//       `http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/`,
-//       {
-//         operation: "read",
-//         company_id: company_id,
-//       }
-//     );
-//      console.log("Full API response:", response);
-//     console.log("Response.data:", response.data);
-//     console.log("Response.data.data:", response.data?.data);
-
-//     const apiData = response.data?.data || [];
-
-//     // console.log("API response:", response.data);
-//     // const apiData = response?.data?.data || [];
-
-//     const mainCategories = [];
-//     const subCategories = [];
-
-//     apiData.forEach(item => {
-//       const mainExpenseName = item.main_expense_name;
-//       const mainExpenseHead = item.main_expense_head;
-//       const policyDetails = item.policy_details || [];
-
-//       // Add main category if not already in the list
-//       if (!mainCategories.find(cat => cat.id === mainExpenseHead)) {
-//         mainCategories.push({
-//           id: mainExpenseHead,
-//           name: mainExpenseName,
-//         });
-//       }
-
-//       // Add all subcategories
-//       policyDetails.forEach(detail => {
-//         subCategories.push({
-//           id: detail.sub_expense_head,
-//           name: `${detail.sub_expense_name} (${detail.limit_name})`,
-//           mainId: mainExpenseHead,
-//         });
-//       });
-//     });
-
-//     // Update state
-//     setMainCategories(mainCategories);
-//     setSubCategories(subCategories);
-
-//     // Create mapping for dependent dropdown
-//     const policyMapTemp = {};
-//     mainCategories.forEach(cat => {
-//       policyMapTemp[cat.name] = subCategories.filter(sub => sub.mainId === cat.id);
-//     });
-
-//     setPolicyMap(policyMapTemp);
-
-//   } catch (error) {
-//     console.error("Error fetching data:", error?.response?.data || error.message);
-//     Alert.alert("Something went wrong while loading policies.");
-//   }
-// };
-// const fetchPolicies = async () => {
-//   try {
-//     const response = await axios.post(
-//       'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
-//       {
-//         company_id: "durr",  // replace with your actual company_id
-//         operation: "read",
-//         grade_id: 53,        // replace with actual grade_id if needed
-//       }
-//     );
-
-//     const apiData = response?.data?.data || [];
-
-//     // Prepare main categories (for dropdown 1)
-//     const mainCategories = apiData.map(item => ({
-//       id: item.main_expense_head,
-//       name: item.main_expense_name,
-//     }));
-
-//     // Prepare sub categories map (for dropdown 2)
-//     // key: main_expense_head id, value: array of sub expense options
-//     const subCategoriesMap = {};
-//     apiData.forEach(item => {
-//       subCategoriesMap[item.main_expense_head] = item.policy_details.map(detail => ({
-//         id: detail.sub_expense_head,
-//         name: `${detail.sub_expense_name} (${detail.limit_name})`,
-//       }));
-//     });
-
-//     setMainCategories(mainCategories);
-//     setSubCategoriesMap(subCategoriesMap);
-
-//   } catch (error) {
-//     console.error("Error fetching policies:", error);
-//     Alert.alert("Failed to load policies");
-//   }
-// };
-
-// useEffect(() => {
-//   console.log("Calling fetchPolicies...");
-//   fetchPolicies();
-// }, []);
-// useEffect(() => {
-//     fetchPolicies();
-//   }, []);
-
-//   const fetchPolicies = async () => {
-//     try {
-//       const response = await axios.post(
-//         'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
-//         {
-//           company_id: "durr",
-//           operation: "read",
-//           grade_id: 53,
-//         }
-//       );
-
-//       const apiData = response?.data?.data || [];
-
-//       // Extract main categories
-//       const mains = apiData.map(item => ({
-//         id: item.main_expense_head,
-//         name: item.main_expense_name,
-//       }));
-
-//       // Map subcategories by main category ID
-//       const subsMap = {};
-//       apiData.forEach(item => {
-//         subsMap[item.main_expense_head] = item.policy_details.map(detail => ({
-//           id: detail.sub_expense_head,
-//           name: `${detail.sub_expense_name} (${detail.limit_name})`,
-//         }));
-//       });
-
-//       setMainCategories(mains);
-//       setSubCategoriesMap(subsMap);
-
-//       // Set default selection to first main category if exists
-//       if (mains.length > 0) {
-//         setSelectedMainCategory(mains[0].id);
-//         const firstSubList = subsMap[mains[0].id];
-//         if (firstSubList && firstSubList.length > 0) {
-//           setSelectedSubCategory(firstSubList[0].id);
-//         }
-//       }
-
-//     } catch (error) {
-//       console.error("Error fetching policies:", error);
-//       Alert.alert("Failed to load policies");
-//     }
-//   };
   useEffect(() => {
     fetchPolicies();
   }, []);
@@ -2733,13 +3159,65 @@ const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
     }
   }, [selectedMainCategory, subCategoriesMap]);
 
-  const fetchPolicies = async () => {
+//   const fetchPolicies = async () => {
+//   try {
+//     const emp_id = await AsyncStorage.getItem('username');
+//     const company_id = await AsyncStorage.getItem('companyname');
+//     const grade_id_string = await AsyncStorage.getItem('grade_id');
+
+//     console.log("📦 Fetched grade_id from storage:", grade_id_string);
+
+//     if (!grade_id_string) {
+//       console.warn("⚠️ No grade_id found in storage.");
+//       return;
+//     }
+
+//     const response = await axios.post(
+//       'http://192.168.0.23:8081/v1/client/policy_claims/claim_policy_employee_grade/',
+//       {
+//         company_id: company_id,
+//         operation: 'read',
+//         grade_id: parseInt(grade_id_string), // make sure it's sent as a number
+//       }
+//     );
+
+//     const apiData = response?.data?.data ?? [];
+
+//     const mains = apiData.map(item => ({
+//       id: item.main_expense_head,
+//       name: item.main_expense_name,
+//     }));
+
+//     const subsMap = {};
+//     apiData.forEach(item => {
+//       const subList = item.policy_details.map(detail => ({
+//         id: detail.sub_expense_head,
+//         name: `${detail.sub_expense_name} (${detail.limit_name})`,
+//       }));
+//       subsMap[item.main_expense_head] = subList;
+//     });
+
+//     console.log('✅ Main Categories:', mains);
+//     console.log('✅ Sub Categories Map:', subsMap);
+
+//     setMainCategories(mains);
+//     setSubCategoriesMap(subsMap);
+
+//     if (mains.length > 0) {
+//       setSelectedMainCategory(mains[0].id);
+//     }
+
+//   } catch (error) {
+//     console.error('❌ Error fetching policies:', error.response?.data || error.message);
+//     Alert.alert('Error', 'Failed to load policy data');
+//   }
+// };
+
+const fetchPolicies = async () => {
   try {
     const emp_id = await AsyncStorage.getItem('username');
     const company_id = await AsyncStorage.getItem('companyname');
     const grade_id_string = await AsyncStorage.getItem('grade_id');
-
-    console.log("📦 Fetched grade_id from storage:", grade_id_string);
 
     if (!grade_id_string) {
       console.warn("⚠️ No grade_id found in storage.");
@@ -2751,7 +3229,7 @@ const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
       {
         company_id: company_id,
         operation: 'read',
-        grade_id: parseInt(grade_id_string), // make sure it's sent as a number
+        grade_id: parseInt(grade_id_string),
       }
     );
 
@@ -2763,30 +3241,42 @@ const [editedTotal, setEditedTotal] = useState(entity?.total?.toString() || '');
     }));
 
     const subsMap = {};
+    const newPolicyMap = {};
+
     apiData.forEach(item => {
       const subList = item.policy_details.map(detail => ({
         id: detail.sub_expense_head,
         name: `${detail.sub_expense_name} (${detail.limit_name})`,
       }));
       subsMap[item.main_expense_head] = subList;
-    });
 
-    console.log('✅ Main Categories:', mains);
-    console.log('✅ Sub Categories Map:', subsMap);
+      // Build policyMap for detailed lookup
+      newPolicyMap[item.main_expense_head] = item.policy_details.map(detail => ({
+        ...detail,
+        policy_detail_id: detail.policy_detail_id,
+        sub_expense_name: detail.sub_expense_name,
+        sub_expense_head: detail.sub_expense_head,
+        policy_amount: detail.policy_amount,
+        frequency: detail.frequency,
+        no_of_times_claim: detail.no_of_times_claim,
+        effective_from: detail.effective_from,
+        effective_end: detail.effective_end,
+        descriptions: detail.descriptions,
+      }));
+    });
 
     setMainCategories(mains);
     setSubCategoriesMap(subsMap);
+    setPolicyMap(newPolicyMap);
 
     if (mains.length > 0) {
       setSelectedMainCategory(mains[0].id);
     }
-
   } catch (error) {
     console.error('❌ Error fetching policies:', error.response?.data || error.message);
     Alert.alert('Error', 'Failed to load policy data');
   }
 };
-
 
   useEffect(() => {
   if (entity) {
@@ -2954,13 +3444,16 @@ useEffect(() => {
   loadData();
 }, []);
 const handleSubmit = async()=> {
+//const mainExpenseHeadId = selectedMainCategory;
+  // const mainCategoryData = mainCategories.find(item => item.name === mainCategory);
 
-  const mainCategoryData = mainCategories.find(item => item.name === mainCategory);
+// const selectedPolicy = policyMap[mainCategory]?.find(
+//   policy => policy.sub_expense_name === subCategory
+// );
 
-const selectedPolicy = policyMap[mainCategory]?.find(
-  policy => policy.sub_expense_name === subCategory
+const selectedPolicy = policyMap[selectedMainCategory]?.find(
+  (item) => item.sub_expense_head === selectedSubCategory
 );
-
 
 if (!selectedPolicy) {
   return Alert.alert("Error", ".");
@@ -2968,7 +3461,9 @@ if (!selectedPolicy) {
 
 
 const policyId = selectedPolicy.policy_detail_id; 
-const mainExpenseHeadId = mainCategoryData?.id;
+//const mainExpenseHeadId = mainCategoryData?.id;
+const mainExpenseHeadId = selectedMainCategory;
+
 const subExpenseHeadId = selectedPolicy.sub_expense_head;  
 
 const ocrDate = entity?.ocr_date; 
@@ -3001,7 +3496,7 @@ const payload = {
       claim_type: "regular",
       emp_id: empId.toString(),
       year: "2025",
-      advance_id: 71,
+      advance_id: null,
       claim_amount: cleanedFinalAmount,
       advance_amount: 0,
       descriptions: "hello",
@@ -3072,9 +3567,10 @@ const payload = {
         selectedValue={selectedMainCategory}
         onValueChange={(itemValue) => setSelectedMainCategory(itemValue)}
       >
-        {mainCategories.map((main) => (
-          <Picker.Item key={main.id} label={main.name} value={main.id} />
-        ))}
+       <Picker.Item label="Select Main Expense" value={null} />
+  {mainCategories.map((main) => (
+    <Picker.Item key={main.id} label={main.name} value={main.id} />
+  ))}
       </Picker>
             </View>
           </View>
@@ -3090,18 +3586,16 @@ const payload = {
       ]}
     >
       <Picker
-        selectedValue={selectedSubCategory}
-        onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
-        enabled={subCategoriesMap[selectedMainCategory]?.length > 0}
-      >
-        {subCategoriesMap[selectedMainCategory] && subCategoriesMap[selectedMainCategory].length > 0 ? (
-          subCategoriesMap[selectedMainCategory].map((sub) => (
-            <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
-          ))
-        ) : (
-          <Picker.Item label="No sub expenses available" value="" />
-        )}
-      </Picker>
+  selectedValue={selectedSubCategory}
+  onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
+  enabled={subCategoriesMap[selectedMainCategory]?.length > 0}
+>
+  <Picker.Item label="Select Sub Expense" value={null} />
+  {subCategoriesMap[selectedMainCategory]?.map((sub) => (
+    <Picker.Item key={sub.id} label={sub.name} value={sub.id} />
+  ))}
+</Picker>
+
     </View>
   </View>
 )}
@@ -3122,9 +3616,13 @@ const payload = {
 </View>
 
               {showPolicyDetails && (() => {
-                const selectedPolicy = policyMap[mainCategory]?.find(
-                  (item) => item.sub_expense_name === subCategory
-                );
+                // const selectedPolicy = policyMap[mainCategory]?.find(
+                //   (item) => item.sub_expense_name === subCategory
+                // );
+                const selectedPolicy = policyMap[selectedMainCategory]?.find(
+  (item) => item.sub_expense_head === selectedSubCategory
+);
+
                 if (!selectedPolicy) return null;
                 return (
                   <View style={[styles.policyContainer, { backgroundColor: theme.background }]}>

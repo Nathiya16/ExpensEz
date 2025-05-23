@@ -1805,15 +1805,15 @@ const getHeight = (value, count) => {
       {/* Legend */}
       <View style={styles.legendContainer}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#4285F4' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#328E6E' }]} />
           <Text>Approved</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#EA4335' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#FF0000' }]} />
           <Text>Rejected</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#FBBC05' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#60B5FF' }]} />
           <Text>Pending</Text>
         </View>
       </View>
@@ -1840,8 +1840,9 @@ const getHeight = (value, count) => {
                         style={[
                           styles.bar, 
                           { 
-                            backgroundColor: '#4285F4',
-                            height: approvedHeight
+                            backgroundColor: '#328E6E',
+                            height: approvedHeight,
+                            
                           }
                         ]} 
                       />
@@ -1853,7 +1854,7 @@ const getHeight = (value, count) => {
                         style={[
                           styles.bar, 
                           { 
-                            backgroundColor: '#EA4335',
+                            backgroundColor: '#FF0000',
                             height: rejectedHeight
                           }
                         ]} 
@@ -1866,7 +1867,7 @@ const getHeight = (value, count) => {
                         style={[
                           styles.bar, 
                           { 
-                            backgroundColor: '#FBBC05',
+                            backgroundColor: '#60B5FF',
                             height: pendingHeight
                           }
                         ]} 
@@ -1953,7 +1954,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bar: {
-    width: '100%',
+    width: '70%',
     borderRadius: 3,
   },
   barLabel: {

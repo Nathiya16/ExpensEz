@@ -18,9 +18,7 @@ activeDot={<View style={Styles.activeDot} />}
         <View style={Styles.container}>
         <Text style={Styles.title}>Welcome!</Text>
         <Text style={Styles.content}>
-        Lorem ipsum dolor sit amet, consectetur 
-adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua.
+        AI Powered Expense Management
         </Text>
         </View>
         <View style={Styles.buttonContainer}>

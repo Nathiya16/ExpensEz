@@ -4452,7 +4452,8 @@ const HomeScreen = ({ navigation }) => {
   </TouchableOpacity>
       </View>
         <View style={styles.greetingCard}>
-          <Text style={styles.greeting}>{userData.greeting}</Text>           <Text style={styles.userName}>{userData.name}</Text>
+          <Text style={styles.greeting}>{userData.greeting}</Text>           
+          {/* <Text style={styles.userName}>{userData.name}</Text> */}
            <Text style={styles.subGreeting}>Have a delightful day!</Text>
          </View>
       <ScrollView
